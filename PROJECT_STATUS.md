@@ -106,8 +106,8 @@ clang-cl UBSan fix); later commits touched only documentation, scripts and the R
 ## Git
 
 * Authors: every commit is authored by the repository owner (`git log --format='%an <%ae>'`).
-* Repository size: about 3.8 MB (compressed) of reachable history over 30 commits and 244 tracked
-  files; the largest file is a 0.5 MB GIF. Rendered frames, videos, build trees and benchmark scratch
+* Repository size: about 3.8 MB (compressed) of reachable history and 244 tracked files; the largest
+  file is a 0.5 MB GIF. Rendered frames, videos, build trees and benchmark scratch
   data are excluded by `.gitignore`.
 * Secret scan: `gitleaks git` over the full history reports no leaks.
 
