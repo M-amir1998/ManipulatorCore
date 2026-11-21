@@ -1,0 +1,69 @@
+# Algorithm registry: the single source of truth for the status matrix in README.md
+# (regenerate with `python scripts/docs/generate_status_matrix.py`).
+#
+# status: implemented | experimental | planned
+# tests:  test files that validate the algorithm
+# demo:   asset in docs/assets (optional)
+# benchmark: Google Benchmark kernel or metric-benchmark section (optional)
+
+algorithms:
+  # --- Rigid-body geometry -------------------------------------------------------------------
+  - {area: Geometry, name: "SO(3)/SE(3) exp, log, adjoint, Lie bracket", status: implemented, tests: [tests/unit/test_so3.cpp, tests/unit/test_se3.cpp, tests/numerical/test_lie_numerics.cpp], benchmark: BM_ExpSE3, reference: "Lynch & Park 2017"}
+  - {area: Geometry, name: "Quaternion / axis-angle / Euler (ZYX, XYZ, ZYZ) conversions", status: implemented, tests: [tests/unit/test_rotation.cpp], benchmark: BM_QuaternionFromRotation, reference: "Shepperd 1978; Siciliano et al. 2009"}
+  - {area: Geometry, name: "SLERP and geodesic / screw pose interpolation", status: implemented, tests: [tests/unit/test_interpolation.cpp], reference: "Shoemake 1985"}
+  # --- Robot model ---------------------------------------------------------------------------
+  - {area: Model, name: "Serial chain model (revolute/prismatic, inertia, armature, limits)", status: implemented, tests: [tests/unit/test_model.cpp], reference: "Featherstone 2008"}
+  - {area: Model, name: "Standard and modified Denavit-Hartenberg", status: implemented, tests: [tests/unit/test_model.cpp], reference: "Spong et al. 2006; Craig 2005"}
+  - {area: Model, name: "URDF import / export (serial chains)", status: implemented, tests: [tests/unit/test_model.cpp]}
+  # --- Kinematics ----------------------------------------------------------------------------
+  - {area: Kinematics, name: "Forward kinematics (chain, DH product, PoE space/body)", status: implemented, tests: [tests/unit/test_kinematics.cpp], demo: fk_ik_2r.gif, benchmark: BM_ForwardKinematics, reference: "Lynch & Park 2017"}
+  - {area: Kinematics, name: "Space, body, geometric and point Jacobians; Jdot*qd", status: implemented, tests: [tests/unit/test_kinematics.cpp], benchmark: BM_GeometricJacobian, reference: "Siciliano et al. 2009"}
+  - {area: Kinematics, name: "Singularity analysis (SVD rank, condition, Yoshikawa)", status: implemented, tests: [tests/unit/test_kinematics.cpp], demo: singularity.gif, reference: "Yoshikawa 1985"}
+  - {area: Kinematics, name: "Workspace and manipulability sampling", status: implemented, tests: [tests/unit/test_kinematics.cpp], demo: workspace.png}
+  # --- Inverse kinematics --------------------------------------------------------------------
+  - {area: IK, name: "Analytical planar 2R / 3R (all branches)", status: implemented, tests: [tests/unit/test_inverse_kinematics.cpp], demo: fk_ik_2r.gif, reference: "Spong et al. 2006"}
+  - {area: IK, name: "Jacobian transpose", status: implemented, tests: [tests/unit/test_inverse_kinematics.cpp], benchmark: "metric: inverse kinematics", reference: "Buss 2004"}
+  - {area: IK, name: "SVD pseudoinverse (Gauss-Newton)", status: implemented, tests: [tests/unit/test_inverse_kinematics.cpp], benchmark: "metric: inverse kinematics"}
+  - {area: IK, name: "Damped least squares (fixed and adaptive)", status: implemented, tests: [tests/unit/test_inverse_kinematics.cpp], demo: singularity.gif, benchmark: BM_InverseKinematicsDLS, reference: "Wampler 1986; Nakamura & Hanafusa 1986"}
+  - {area: IK, name: "Levenberg-Marquardt", status: implemented, tests: [tests/unit/test_inverse_kinematics.cpp], benchmark: "metric: inverse kinematics", reference: "Sugihara 2011"}
+  - {area: IK, name: "Null-space redundancy resolution (centering, limits, manipulability)", status: implemented, tests: [tests/unit/test_inverse_kinematics.cpp], demo: nullspace.gif, reference: "Liegeois 1977; Zghal et al. 1990"}
+  - {area: IK, name: "Active-set joint-limit clamping and multi-start IK", status: implemented, tests: [tests/unit/test_inverse_kinematics.cpp], demo: ik_local_minimum.png, benchmark: "metric: inverse kinematics"}
+  # --- Dynamics ------------------------------------------------------------------------------
+  - {area: Dynamics, name: "Recursive Newton-Euler (inverse dynamics, gravity, bias)", status: implemented, tests: [tests/unit/test_dynamics.cpp], benchmark: BM_InverseDynamicsRNEA, reference: "Featherstone 2008"}
+  - {area: Dynamics, name: "Composite Rigid Body (mass matrix)", status: implemented, tests: [tests/unit/test_dynamics.cpp], benchmark: BM_MassMatrixCRBA, reference: "Featherstone 2008"}
+  - {area: Dynamics, name: "Articulated Body (forward dynamics)", status: implemented, tests: [tests/unit/test_dynamics.cpp], benchmark: BM_ForwardDynamicsABA, reference: "Featherstone 2008"}
+  - {area: Dynamics, name: "Closed-form 2R Lagrangian reference and Christoffel Coriolis", status: implemented, tests: [tests/unit/test_dynamics.cpp], reference: "Spong et al. 2006"}
+  - {area: Dynamics, name: "Explicit Euler, semi-implicit Euler, RK4 integration", status: implemented, tests: [tests/numerical/test_dynamics_numerics.cpp], demo: gravity_hold.gif}
+  # --- Trajectories --------------------------------------------------------------------------
+  - {area: Trajectory, name: "Cubic / quintic polynomials, trapezoidal and double-S profiles", status: implemented, tests: [tests/unit/test_trajectory.cpp], reference: "Biagiotti & Melchiorri 2008"}
+  - {area: Trajectory, name: "C2 cubic splines and synchronized line motion", status: implemented, tests: [tests/unit/test_trajectory.cpp]}
+  - {area: Trajectory, name: "Cartesian line / arc with SO(3) geodesic orientation", status: implemented, tests: [tests/unit/test_trajectory.cpp], demo: cartesian_paths.gif}
+  - {area: Trajectory, name: "Time-optimal parameterization (reachability, box limits)", status: implemented, tests: [tests/unit/test_trajectory.cpp, tests/integration/test_planning_pipeline.cpp], demo: hero.gif, reference: "Pham & Pham 2018"}
+  # --- Collision -----------------------------------------------------------------------------
+  - {area: Collision, name: "Sphere / capsule / box / half-space signed distances", status: implemented, tests: [tests/unit/test_collision.cpp], demo: collision.gif, reference: "Ericson 2005"}
+  - {area: Collision, name: "GJK distance and SAT penetration depth", status: implemented, tests: [tests/unit/test_collision.cpp], reference: "Gilbert, Johnson & Keerthi 1988"}
+  - {area: Collision, name: "AABB broad phase, self- and environment collision checking", status: implemented, tests: [tests/unit/test_collision.cpp], demo: collision.gif, benchmark: BM_CollisionFreeQuery}
+  # --- Planning ------------------------------------------------------------------------------
+  - {area: Planning, name: "RRT", status: implemented, tests: [tests/unit/test_planning.cpp], demo: planners_2r.png, benchmark: "metric: motion planning", reference: "LaValle 1998"}
+  - {area: Planning, name: "RRT-Connect", status: implemented, tests: [tests/unit/test_planning.cpp, tests/integration/test_planning_pipeline.cpp], demo: rrt_2r.gif, benchmark: "metric: motion planning", reference: "Kuffner & LaValle 2000"}
+  - {area: Planning, name: "RRT*", status: implemented, tests: [tests/unit/test_planning.cpp], demo: planners_2r.png, benchmark: "metric: motion planning", reference: "Karaman & Frazzoli 2011"}
+  - {area: Planning, name: "PRM (k-nearest, A*, multi-query)", status: implemented, tests: [tests/unit/test_planning.cpp], demo: planners_2r.png, benchmark: "metric: motion planning", reference: "Kavraki et al. 1996"}
+  - {area: Planning, name: "Shortcutting and re-validated spline smoothing", status: implemented, tests: [tests/unit/test_planning.cpp], reference: "Geraerts & Overmars 2007"}
+  - {area: Planning, name: "Pose goal: IK candidates + planning + timing + verification", status: implemented, tests: [tests/integration/test_planning_pipeline.cpp], demo: hero.gif}
+  # --- Control -------------------------------------------------------------------------------
+  - {area: Control, name: "Gravity compensation, PD, PID (anti-windup)", status: implemented, tests: [tests/unit/test_control.cpp, tests/integration/test_control_loops.cpp], demo: gravity_hold.gif, benchmark: "metric: control", reference: "Takegaki & Arimoto 1981"}
+  - {area: Control, name: "Computed torque", status: implemented, tests: [tests/unit/test_control.cpp, tests/integration/test_control_loops.cpp], demo: computed_torque.gif, benchmark: "metric: control"}
+  - {area: Control, name: "Cartesian PD (Jacobian transpose)", status: implemented, tests: [tests/integration/test_control_loops.cpp], benchmark: "metric: control"}
+  - {area: Control, name: "Cartesian impedance", status: implemented, tests: [tests/unit/test_control.cpp, tests/integration/test_control_loops.cpp], demo: impedance.gif, benchmark: "metric: control", reference: "Hogan 1985"}
+  - {area: Control, name: "Admittance", status: implemented, tests: [tests/integration/test_control_loops.cpp], demo: admittance.gif}
+  - {area: Control, name: "Operational-space control", status: implemented, tests: [tests/unit/test_control.cpp, tests/integration/test_control_loops.cpp], demo: operational_space.gif, benchmark: "metric: control", reference: "Khatib 1987"}
+  - {area: Control, name: "Null-space posture and smooth joint-limit avoidance", status: implemented, tests: [tests/unit/test_control.cpp], demo: nullspace.gif}
+  # --- Simulation and integration ------------------------------------------------------------
+  - {area: Simulation, name: "Deterministic simulator (saturation, damping, limits, contact)", status: implemented, tests: [tests/integration/test_control_loops.cpp], demo: impedance.gif}
+  - {area: Integration, name: "Python bindings (pybind11)", status: implemented, tests: [python/tests/test_bindings.py]}
+  - {area: Integration, name: "ROS 2 adapter (simulator, planner, URDF, RViz)", status: experimental, tests: [ros2/manipulatorcore_ros/test/test_conversions.cpp]}
+  # --- Roadmap -------------------------------------------------------------------------------
+  - {area: Roadmap, name: "Torque- and jerk-constrained time parameterization", status: planned}
+  - {area: Roadmap, name: "Continuous collision detection and mesh geometry", status: planned}
+  - {area: Roadmap, name: "Spatial index (kd-tree) for planners", status: planned}
+  - {area: Roadmap, name: "Hybrid force/position control", status: planned}
