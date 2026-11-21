@@ -4,14 +4,19 @@ docs/benchmarks/README.md.
 Only machine-neutral metadata is recorded (CPU model, core count, compiler and build type): no host
 names, user names or paths.
 
+On CPUs with performance and efficiency cores the operating system may move the benchmark thread
+between core types, which changes kernel timings by about 2x. Pin the run to one performance core
+with --cpu (children inherit the affinity).
+
 Example:
-    python scripts/benchmark/run_benchmarks.py --build build/release
+    python scripts/benchmark/run_benchmarks.py --build build/release --cpu 2
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import platform
 import subprocess
 import sys
@@ -69,6 +74,23 @@ def cpu_name() -> str:
     return platform.processor() or "unknown"
 
 
+def pin_to_cpu(cpu: int) -> None:
+    """Restricts this process (and the benchmark processes it starts) to one logical CPU."""
+    if hasattr(os, "sched_setaffinity"):
+        os.sched_setaffinity(0, {cpu})
+        return
+    if sys.platform == "win32":
+        import ctypes
+
+        kernel32 = ctypes.windll.kernel32
+        kernel32.GetCurrentProcess.restype = ctypes.c_void_p
+        kernel32.SetProcessAffinityMask.argtypes = [ctypes.c_void_p, ctypes.c_size_t]
+        if not kernel32.SetProcessAffinityMask(kernel32.GetCurrentProcess(), 1 << cpu):
+            raise OSError(f"could not pin the process to logical CPU {cpu}")
+        return
+    raise OSError("CPU pinning is not supported on this platform")
+
+
 def format_time(ns: float) -> str:
     if ns < 1e3:
         return f"{ns:.0f} ns"
@@ -100,7 +122,10 @@ def main() -> int:
     parser.add_argument("--build", type=Path, required=True, help="Release build directory")
     parser.add_argument("--out", type=Path, default=REPO / "docs" / "benchmarks" / "README.md")
     parser.add_argument("--min-time", default="0.2s", help="Google Benchmark minimum time per kernel")
+    parser.add_argument("--cpu", type=int, help="pin the benchmarks to this logical CPU (recommended)")
     args = parser.parse_args()
+    if args.cpu is not None:
+        pin_to_cpu(args.cpu)
 
     build_type = cmake_cache(args.build, "CMAKE_BUILD_TYPE")
     if build_type not in ("Release", "RelWithDebInfo"):
@@ -141,7 +166,8 @@ def main() -> int:
         f"| OS | {platform.system()} {platform.release()} |",
         f"| Compiler | {compiler} |",
         f"| Build type | {build_type} |",
-        "| Threads | single-threaded |\n",
+        "| Threads | single-threaded, "
+        + (f"pinned to logical CPU {args.cpu} |\n" if args.cpu is not None else "not pinned |\n"),
     ]
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text("\n".join(header) + "\n" + kernel_tables(kernels) + metrics, encoding="utf-8")
