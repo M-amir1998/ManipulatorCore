@@ -83,6 +83,15 @@ mc_add_module(
   SOURCES collision/distance.cpp collision/aabb.cpp collision/robot_collision.cpp
   DEPS mc_kinematics)
 
+mc_add_module(
+  planning
+  SOURCES planning/joint_space.cpp
+          planning/planner.cpp
+          planning/path_processing.cpp
+          planning/pose_goal_planning.cpp
+          planning/scenarios.cpp
+  DEPS mc_collision mc_trajectory)
+
 # Umbrella target linking every module.
 add_library(mc_all INTERFACE)
 add_library(ManipulatorCore::ManipulatorCore ALIAS mc_all)

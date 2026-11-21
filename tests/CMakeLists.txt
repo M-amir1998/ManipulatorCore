@@ -44,7 +44,10 @@ mc_add_test_suite(
   unit/test_inverse_kinematics.cpp
   unit/test_dynamics.cpp
   unit/test_trajectory.cpp
-  unit/test_collision.cpp)
+  unit/test_collision.cpp
+  unit/test_planning.cpp)
 
 mc_add_test_suite(mc_numerical_tests numerical numerical/test_lie_numerics.cpp
                   numerical/test_dynamics_numerics.cpp)
+
+mc_add_test_suite(mc_integration_tests integration integration/test_planning_pipeline.cpp)
