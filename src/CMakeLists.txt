@@ -63,6 +63,11 @@ mc_add_module(
           optimization/objectives.cpp
   DEPS mc_model)
 
+mc_add_module(
+  dynamics
+  SOURCES dynamics/rigid_body_dynamics.cpp dynamics/planar_2r.cpp dynamics/integrators.cpp
+  DEPS mc_kinematics)
+
 # Umbrella target linking every module.
 add_library(mc_all INTERFACE)
 add_library(ManipulatorCore::ManipulatorCore ALIAS mc_all)
