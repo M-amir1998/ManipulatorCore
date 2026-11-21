@@ -15,13 +15,22 @@ docker run --rm -v "${repo}:/src:ro" "${image}" bash -c '
   cd /tmp/repo
   g++ --version | head -n 1
   cmake --version | head -n 1
-  echo "==== Debug build (GCC, -Werror) ===="
-  cmake --preset debug > /dev/null
-  cmake --build --preset debug -j "$(nproc)" 2>&1 | grep -E "warning|error|FAILED" || true
-  ctest --test-dir build/debug -j "$(nproc)" --output-on-failure 2>&1 | tail -n 4
-  echo "==== AddressSanitizer + UBSan (GCC) ===="
-  cmake --preset asan-ubsan > /dev/null
-  cmake --build --preset asan-ubsan -j "$(nproc)" 2>&1 | grep -E "warning|error|FAILED" || true
-  ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=print_stacktrace=1:halt_on_error=1 \
-    ctest --test-dir build/asan-ubsan -j "$(nproc)" --output-on-failure 2>&1 | tail -n 4
+  build_and_test() {
+    local preset="$1"
+    echo "==== ${preset} ===="
+    cmake --preset "${preset}" > /tmp/configure.log 2>&1 || { tail -n 30 /tmp/configure.log; exit 1; }
+    if ! cmake --build --preset "${preset}" -j "$(nproc)" > /tmp/build.log 2>&1; then
+      grep -E "error|FAILED" /tmp/build.log | head -n 40
+      exit 1
+    fi
+    echo "warnings: $(grep -c "warning:" /tmp/build.log || true)"
+    if ! ctest --test-dir "build/${preset}" -j "$(nproc)" --output-on-failure > /tmp/ctest.log 2>&1; then
+      grep -E "Failed|\*\*\*|error|runtime error|AddressSanitizer" /tmp/ctest.log | head -n 40
+      tail -n 5 /tmp/ctest.log
+      exit 1
+    fi
+    tail -n 3 /tmp/ctest.log
+  }
+  build_and_test debug
+  ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=print_stacktrace=1:halt_on_error=1 build_and_test asan-ubsan
 '

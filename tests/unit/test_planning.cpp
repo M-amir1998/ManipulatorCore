@@ -125,8 +125,8 @@ TEST_P(PlannerBehaviour, InvalidStartAndGoal) {
 }
 
 INSTANTIATE_TEST_SUITE_P(AllPlanners, PlannerBehaviour, ::testing::Values("RRT", "RRT-Connect", "RRT*", "PRM"),
-                         [](const ::testing::TestParamInfo<std::string>& info) {
-                           std::string name = info.param;
+                         [](const ::testing::TestParamInfo<std::string>& param) {
+                           std::string name = param.param;
                            std::erase(name, '-');
                            std::replace(name.begin(), name.end(), '*', 'S');
                            return name;

@@ -111,8 +111,8 @@ INSTANTIATE_TEST_SUITE_P(Methods, NumericalIK,
                                            IKCase{IKMethod::PseudoInverse, 200},
                                            IKCase{IKMethod::DampedLeastSquares, 200},
                                            IKCase{IKMethod::LevenbergMarquardt, 200}),
-                         [](const ::testing::TestParamInfo<IKCase>& info) {
-                           std::string name = toString(info.param.method);
+                         [](const ::testing::TestParamInfo<IKCase>& param) {
+                           std::string name = toString(param.param.method);
                            std::erase(name, '-');
                            return name;
                          });

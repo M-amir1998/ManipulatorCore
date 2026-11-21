@@ -87,7 +87,7 @@ void Inertia::validate() const {
   require((inertia_com - inertia_com.transpose()).cwiseAbs().maxCoeff() <= 1e-9 * scale,
           "Inertia: inertia tensor must be symmetric");
   const Eigen::SelfAdjointEigenSolver<Mat3> eig(inertia_com, Eigen::EigenvaluesOnly);
-  const Vec3 principal = eig.eigenvalues();
+  const Vec3& principal = eig.eigenvalues();
   const double tol = 1e-9 * scale;
   require((principal.array() >= -tol).all(), "Inertia: principal moments must be non-negative");
   require(principal(0) + principal(1) >= principal(2) - tol,

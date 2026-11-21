@@ -9,6 +9,7 @@
 #include <limits>
 #include <numeric>
 #include <queue>
+#include <utility>
 
 namespace mc {
 
@@ -163,9 +164,8 @@ PlannerResult RRTPlanner::solve(const PlanningProblem& problem) {
       result.status = PlannerStatus::TimeLimit;
       break;
     }
-    const VecX target = rng.bernoulli(settings_.goal_bias)
-                            ? problem.goals[rng.uniformIndex(problem.goals.size())]
-                            : space.sampleUniform(rng);
+    const VecX target = rng.bernoulli(settings_.goal_bias) ? problem.goals[rng.uniformIndex(problem.goals.size())]
+                                                           : space.sampleUniform(rng);
     const int near = tree.nearest(space, target);
     const VecX q_new = space.steer(tree.q[static_cast<std::size_t>(near)], target, settings_.max_step);
     if (!validator_->isEdgeValid(tree.q[static_cast<std::size_t>(near)], q_new)) {
@@ -313,9 +313,8 @@ PlannerResult RRTStarPlanner::solve(const PlanningProblem& problem) {
     if (timeExceeded(settings_, t0)) {
       break;
     }
-    const VecX target = rng.bernoulli(settings_.goal_bias)
-                            ? problem.goals[rng.uniformIndex(problem.goals.size())]
-                            : space.sampleUniform(rng);
+    const VecX target = rng.bernoulli(settings_.goal_bias) ? problem.goals[rng.uniformIndex(problem.goals.size())]
+                                                           : space.sampleUniform(rng);
     const int nearest = tree.nearest(space, target);
     const VecX q_new = space.steer(tree.q[static_cast<std::size_t>(nearest)], target, settings_.max_step);
     if (!validator_->isValid(q_new)) {
@@ -334,6 +333,7 @@ PlannerResult RRTStarPlanner::solve(const PlanningProblem& problem) {
     }
     // Choose the parent minimizing cost-to-come; edges are validated lazily in cost order.
     std::vector<std::pair<double, int>> candidates;
+    candidates.reserve(near.size());
     for (const int i : near) {
       candidates.emplace_back(
           tree.cost[static_cast<std::size_t>(i)] + space.distance(tree.q[static_cast<std::size_t>(i)], q_new), i);
@@ -426,13 +426,14 @@ std::vector<int> PRMPlanner::nearestNodes(const VecX& q, int k, int exclude) con
   d.reserve(nodes_.size());
   const JointSpace& space = validator_->space();
   for (std::size_t i = 0; i < nodes_.size(); ++i) {
-    if (static_cast<int>(i) != exclude) {
+    if (std::cmp_not_equal(i, exclude)) {
       d.emplace_back(space.distance(nodes_[i], q), static_cast<int>(i));
     }
   }
   const auto kk = std::min<std::size_t>(static_cast<std::size_t>(k), d.size());
   std::partial_sort(d.begin(), d.begin() + static_cast<std::ptrdiff_t>(kk), d.end());
   std::vector<int> out;
+  out.reserve(kk);
   for (std::size_t i = 0; i < kk; ++i) {
     out.push_back(d[i].second);
   }
@@ -557,7 +558,7 @@ PlannerResult PRMPlanner::solve(const PlanningProblem& problem) {
     result.tree.tree_index.assign(nodes_.size(), 0);
     for (std::size_t i = 0; i < adjacency_.size(); ++i) {
       for (const auto& [j, w] : adjacency_[i]) {
-        if (static_cast<int>(i) < j) {
+        if (std::cmp_less(i, j)) {
           result.tree.edges.emplace_back(static_cast<int>(i), j);
         }
       }

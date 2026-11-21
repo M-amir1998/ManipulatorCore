@@ -40,11 +40,12 @@ double lineScaling(const VecX& delta, const VecX& limits, const char* what) {
 PolynomialTrajectory::PolynomialTrajectory(MatX coefficients, double duration)
     : coefficients_(std::move(coefficients)), duration_(duration) {}
 
-PolynomialTrajectory PolynomialTrajectory::cubic(const VecX& q0, const VecX& qf, double T, const VecX& v0_in,
+PolynomialTrajectory PolynomialTrajectory::cubic(const VecX& q0, const VecX& qf, double duration, const VecX& v0_in,
                                                  const VecX& vf_in) {
   const Index n = q0.size();
   requireVector(q0, n, "PolynomialTrajectory::cubic: q0");
   requireVector(qf, n, "PolynomialTrajectory::cubic: qf");
+  const double T = duration;
   require(std::isfinite(T) && T > 0.0, "PolynomialTrajectory::cubic: duration must be positive");
   const VecX v0 = orZero(v0_in, n, "PolynomialTrajectory::cubic: v0");
   const VecX vf = orZero(vf_in, n, "PolynomialTrajectory::cubic: vf");
@@ -57,11 +58,12 @@ PolynomialTrajectory PolynomialTrajectory::cubic(const VecX& q0, const VecX& qf,
   return {c, T};
 }
 
-PolynomialTrajectory PolynomialTrajectory::quintic(const VecX& q0, const VecX& qf, double T, const VecX& v0_in,
+PolynomialTrajectory PolynomialTrajectory::quintic(const VecX& q0, const VecX& qf, double duration, const VecX& v0_in,
                                                    const VecX& vf_in, const VecX& a0_in, const VecX& af_in) {
   const Index n = q0.size();
   requireVector(q0, n, "PolynomialTrajectory::quintic: q0");
   requireVector(qf, n, "PolynomialTrajectory::quintic: qf");
+  const double T = duration;
   require(std::isfinite(T) && T > 0.0, "PolynomialTrajectory::quintic: duration must be positive");
   const VecX v0 = orZero(v0_in, n, "PolynomialTrajectory::quintic: v0");
   const VecX vf = orZero(vf_in, n, "PolynomialTrajectory::quintic: vf");
@@ -126,7 +128,7 @@ TrajectoryPoint LinearInterpolationTrajectory::sample(double t) const {
 // LineTrajectory
 // ------------------------------------------------------------------------------------------------
 
-LineTrajectory::LineTrajectory(VecX q0, VecX q1, std::shared_ptr<const ScalarProfile> profile)
+LineTrajectory::LineTrajectory(VecX q0, const VecX& q1, std::shared_ptr<const ScalarProfile> profile)
     : q0_(std::move(q0)), delta_(q1 - q0_), profile_(std::move(profile)) {
   requireVector(q1, q0_.size(), "LineTrajectory: q1");
   requireFinite(q0_, "LineTrajectory: q0");

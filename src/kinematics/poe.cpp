@@ -19,7 +19,7 @@ ProductOfExponentials productOfExponentials(const RobotModel& model) {
       S << Vec3::Zero(), a;
     }
     poe.space_screws.push_back(S);
-    poe.body_screws.push_back(Ad_M_inv * S);
+    poe.body_screws.emplace_back(Ad_M_inv * S);
   }
   return poe;
 }

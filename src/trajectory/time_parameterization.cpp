@@ -171,7 +171,7 @@ TimeOptimalTrajectory timeOptimalParameterization(std::shared_ptr<const JointPat
   }
 
   std::vector<Constraint> cs;
-  cs.reserve(static_cast<std::size_t>(6 * n + 2));
+  cs.reserve(6 * static_cast<std::size_t>(n) + 2);
   // Constraints of grid segment i (from s_i to s_{i+1}, length ds_i) with the next state
   // x + 2 ds_i u bounded by [0, x_next_max]. Joint limits are imposed at both ends of the segment.
   auto buildConstraints = [&](std::size_t i, double x_next_max) {
@@ -201,8 +201,10 @@ TimeOptimalTrajectory timeOptimalParameterization(std::shared_ptr<const JointPat
   for (std::size_t i = N; i-- > 0;) {
     buildConstraints(i, K[i + 1]);
     const auto range = feasibleX(cs, 0.0, kUnbounded);
-    require(range.has_value() && range->first <= 1e-12,
-            "timeOptimalParameterization: the path cannot be traversed from rest at grid point " + std::to_string(i));
+    if (!range.has_value() || range->first > 1e-12) {
+      throw InvalidArgument("timeOptimalParameterization: the path cannot be traversed from rest at grid point " +
+                            std::to_string(i));
+    }
     K[i] = range->second;
   }
 

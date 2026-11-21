@@ -84,13 +84,18 @@ namespace {
 
 VecX zeroIfEmpty(const VecX& v, Index n) { return v.size() == 0 ? VecX::Zero(n) : v; }
 
+CubicSpline makeClampedSpline(std::vector<double> times, std::vector<VecX> waypoints, const VecX& start_velocity,
+                              const VecX& end_velocity) {
+  const Index dim = waypoints.empty() ? 0 : waypoints.front().size();
+  return {std::move(times), std::move(waypoints), CubicSpline::Boundary::Clamped, zeroIfEmpty(start_velocity, dim),
+          zeroIfEmpty(end_velocity, dim)};
+}
+
 }  // namespace
 
 CubicSplineTrajectory::CubicSplineTrajectory(std::vector<double> times, std::vector<VecX> waypoints,
                                              const VecX& start_velocity, const VecX& end_velocity)
-    : spline_(times, waypoints, CubicSpline::Boundary::Clamped,
-              zeroIfEmpty(start_velocity, waypoints.empty() ? 0 : waypoints.front().size()),
-              zeroIfEmpty(end_velocity, waypoints.empty() ? 0 : waypoints.front().size())) {
+    : spline_(makeClampedSpline(std::move(times), std::move(waypoints), start_velocity, end_velocity)) {
   require(spline_.start() == 0.0, "CubicSplineTrajectory: times must start at 0");
 }
 

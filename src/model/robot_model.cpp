@@ -7,8 +7,11 @@
 
 namespace mc {
 
-RobotModel::RobotModel(std::string name, std::vector<Body> bodies, const SE3& T_flange_ee, const Vec3& gravity)
-    : name_(std::move(name)), bodies_(std::move(bodies)), T_flange_ee_(T_flange_ee), gravity_(gravity) {
+RobotModel::RobotModel(std::string name, std::vector<Body> bodies, SE3 T_flange_ee, Vec3 gravity)
+    : name_(std::move(name)),
+      bodies_(std::move(bodies)),
+      T_flange_ee_(std::move(T_flange_ee)),
+      gravity_(std::move(gravity)) {
   validate();
   refreshLimitCache();
 }

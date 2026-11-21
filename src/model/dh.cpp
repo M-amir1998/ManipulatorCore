@@ -3,6 +3,8 @@
 #include "manipulatorcore/geometry/so3.hpp"
 #include "manipulatorcore/math/error.hpp"
 
+#include <utility>
+
 namespace mc {
 
 namespace {
@@ -71,11 +73,11 @@ RobotModel robotFromDH(const DHTable& table, const std::string& name, const Vec3
     bodies.push_back(std::move(body));
   }
   const SE3 tool = table.convention == DHConvention::Standard ? previous_fixed * table.tool : table.tool;
-  return RobotModel(name, std::move(bodies), tool, gravity);
+  return {name, std::move(bodies), tool, gravity};
 }
 
 SE3 dhFrameInBody(const DHTable& table, int body) {
-  require(body >= 0 && body < static_cast<int>(table.rows.size()), "dhFrameInBody: index out of range");
+  require(body >= 0 && std::cmp_less(body, table.rows.size()), "dhFrameInBody: index out of range");
   if (table.convention == DHConvention::Modified) {
     return SE3::Identity();
   }

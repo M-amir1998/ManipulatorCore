@@ -54,7 +54,7 @@ class LinearInterpolationTrajectory final : public JointTrajectory {
 /// joints start and stop together and the path stays on the line.
 class LineTrajectory final : public JointTrajectory {
  public:
-  LineTrajectory(VecX q0, VecX q1, std::shared_ptr<const ScalarProfile> profile);
+  LineTrajectory(VecX q0, const VecX& q1, std::shared_ptr<const ScalarProfile> profile);
 
   /// Minimum-time synchronized trapezoidal motion under per-joint velocity/acceleration limits.
   [[nodiscard]] static LineTrajectory trapezoidal(const VecX& q0, const VecX& q1, const VecX& velocity_limits,

@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <utility>
 
 namespace mc {
 
@@ -275,7 +276,7 @@ std::vector<IKResult> solveIKMultiStart(const RobotModel& model, const SE3& targ
       continue;
     }
     solutions.push_back(std::move(r));
-    if (static_cast<int>(solutions.size()) >= options.max_solutions) {
+    if (std::cmp_greater_equal(solutions.size(), options.max_solutions)) {
       break;
     }
   }

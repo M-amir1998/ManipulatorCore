@@ -31,7 +31,10 @@ function(mc_set_project_warnings target)
       -Wcast-align
       -Wold-style-cast
       -Wnull-dereference
-      -Wimplicit-fallthrough)
+      -Wimplicit-fallthrough
+      # C++20 designated initializers that rely on default member initializers are idiomatic here;
+      # GCC 13 nevertheless reports the omitted members under -Wextra.
+      -Wno-missing-field-initializers)
   set(gcc_only_warnings -Wduplicated-cond -Wlogical-op -Wuseless-cast)
 
   if(MC_WARNINGS_AS_ERRORS)

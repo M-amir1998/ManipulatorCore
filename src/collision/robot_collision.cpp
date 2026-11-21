@@ -11,6 +11,16 @@
 
 namespace mc {
 
+namespace {
+
+/// Row/column of a body in the allowed-collision matrix (the base, index -1, is slot 0).
+std::size_t slot(int body) {
+  const int index = body + 1;
+  return static_cast<std::size_t>(index);
+}
+
+}  // namespace
+
 RobotCollisionChecker::RobotCollisionChecker(RobotModel model, std::vector<Shape> obstacles,
                                              const CollisionCheckerOptions& options)
     : model_(std::move(model)), obstacles_(std::move(obstacles)), options_(options) {
@@ -55,24 +65,27 @@ void RobotCollisionChecker::validateObstacles() {
 void RobotCollisionChecker::allowCollision(int body_a, int body_b, bool allowed) {
   require(body_a >= -1 && body_a < model_.dof() && body_b >= -1 && body_b < model_.dof(),
           "RobotCollisionChecker::allowCollision: body index out of range");
-  allowed_[static_cast<std::size_t>(body_a + 1)][static_cast<std::size_t>(body_b + 1)] = allowed;
-  allowed_[static_cast<std::size_t>(body_b + 1)][static_cast<std::size_t>(body_a + 1)] = allowed;
+  allowed_[slot(body_a)][slot(body_b)] = allowed;
+  allowed_[slot(body_b)][slot(body_a)] = allowed;
 }
 
 bool RobotCollisionChecker::isCollisionAllowed(int body_a, int body_b) const {
   require(body_a >= -1 && body_a < model_.dof() && body_b >= -1 && body_b < model_.dof(),
           "RobotCollisionChecker::isCollisionAllowed: body index out of range");
-  return allowed_[static_cast<std::size_t>(body_a + 1)][static_cast<std::size_t>(body_b + 1)];
+  return allowed_[slot(body_a)][slot(body_b)];
 }
 
-bool RobotCollisionChecker::selfPairChecked(int a, int b) const {
-  return !allowed_[static_cast<std::size_t>(a + 1)][static_cast<std::size_t>(b + 1)];
-}
+bool RobotCollisionChecker::selfPairChecked(int a, int b) const { return !allowed_[slot(a)][slot(b)]; }
 
 std::vector<RobotCollisionChecker::PosedShape> RobotCollisionChecker::poseRobot(const VecX& q) const {
   const KinematicState state = forwardKinematics(model_, q);
   std::vector<PosedShape> shapes;
   const auto& base = model_.baseCollision();
+  std::size_t total = base.size();
+  for (const Body& b : model_.bodies()) {
+    total += b.collision.size();
+  }
+  shapes.reserve(total);
   for (std::size_t k = 0; k < base.size(); ++k) {
     shapes.push_back(
         {-1, static_cast<int>(k), &base[k].geometry, base[k].pose, AABB::of(base[k].geometry, base[k].pose)});
@@ -98,7 +111,8 @@ bool prunable(double lower_bound, double cutoff) { return lower_bound > 0.0 && l
 }  // namespace
 
 template <typename Visitor, typename Cutoff>
-void RobotCollisionChecker::forEachPair(const std::vector<PosedShape>& robot, Visitor&& visit, Cutoff&& cutoff) const {
+void RobotCollisionChecker::forEachPair(const std::vector<PosedShape>& robot, const Visitor& visit,
+                                        const Cutoff& cutoff) const {
   if (options_.check_environment) {
     for (const PosedShape& rs : robot) {
       if (rs.body < 0 && !options_.check_base_against_environment) {

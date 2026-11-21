@@ -141,8 +141,8 @@ INSTANTIATE_TEST_SUITE_P(AllCases, DoubleS,
                                            DoubleSCase{10.0, 1.0, 5.0, 2.0},    // vmax reached, amax not
                                            DoubleSCase{0.8, 2.0, 1.0, 10.0},    // amax reached, vmax not
                                            DoubleSCase{0.01, 2.0, 5.0, 10.0}),  // neither reached
-                         [](const ::testing::TestParamInfo<DoubleSCase>& info) {
-                           return "case" + std::to_string(info.index);
+                         [](const ::testing::TestParamInfo<DoubleSCase>& param) {
+                           return "case" + std::to_string(param.index);
                          });
 
 // ------------------------------------------------------------------------------------------------

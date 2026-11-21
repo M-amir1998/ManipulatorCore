@@ -499,7 +499,7 @@ DistanceResult computeDistance(const ShapeGeometry& a, const SE3& T_a, const Sha
   const Core ca = makeCore(a, T_a);
   const Core cb = makeCore(b, T_b);
   using T = Core::Type;
-  require(!(ca.type == T::Plane && cb.type == T::Plane), "computeDistance: half-space vs half-space is undefined");
+  require(ca.type != T::Plane || cb.type != T::Plane, "computeDistance: half-space vs half-space is undefined");
   if (ca.type == T::Plane) {
     return flipped(coreVsPlane(cb, ca));
   }

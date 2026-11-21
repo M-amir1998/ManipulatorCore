@@ -53,7 +53,11 @@ VecX postureTorque(const RobotModel& model, const VecX& q, const VecX& qd, const
 
 TaskSpacePDController::TaskSpacePDController(RobotModel model, Mat6 kp, Mat6 kd, CartesianReferenceFn reference,
                                              NullSpaceTask null_space)
-    : model_(std::move(model)), kp_(kp), kd_(kd), reference_(std::move(reference)), null_space_(std::move(null_space)) {
+    : model_(std::move(model)),
+      kp_(std::move(kp)),
+      kd_(std::move(kd)),
+      reference_(std::move(reference)),
+      null_space_(std::move(null_space)) {
   validateGain(kp_, "TaskSpacePDController: kp");
   validateGain(kd_, "TaskSpacePDController: kd");
   validateNullSpace(model_, null_space_);
@@ -73,8 +77,8 @@ VecX TaskSpacePDController::computeTorque(const ControllerInput& input) {
 CartesianImpedanceController::CartesianImpedanceController(RobotModel model, Mat6 stiffness, Mat6 damping,
                                                            CartesianReferenceFn reference, NullSpaceTask null_space)
     : model_(std::move(model)),
-      stiffness_(stiffness),
-      damping_(damping),
+      stiffness_(std::move(stiffness)),
+      damping_(std::move(damping)),
       reference_(std::move(reference)),
       null_space_(std::move(null_space)) {
   validateGain(stiffness_, "CartesianImpedanceController: stiffness");
@@ -100,9 +104,9 @@ VecX CartesianImpedanceController::computeTorque(const ControllerInput& input) {
 AdmittanceController::AdmittanceController(RobotModel model, AdmittanceParameters admittance, Mat6 inner_kp,
                                            Mat6 inner_kd, CartesianReferenceFn reference, double null_space_damping)
     : model_(std::move(model)),
-      params_(admittance),
-      kp_(inner_kp),
-      kd_(inner_kd),
+      params_(std::move(admittance)),
+      kp_(std::move(inner_kp)),
+      kd_(std::move(inner_kd)),
       reference_(std::move(reference)),
       null_damping_(null_space_damping) {
   require((params_.mass.array() > 0.0).all() && (params_.damping.array() >= 0.0).all() &&
@@ -184,8 +188,8 @@ OperationalSpaceController::OperationalSpaceController(RobotModel model, Mat6 kp
                                                        CartesianReferenceFn reference, NullSpaceTask null_space,
                                                        double singularity_threshold)
     : model_(std::move(model)),
-      kp_(kp),
-      kd_(kd),
+      kp_(std::move(kp)),
+      kd_(std::move(kd)),
       reference_(std::move(reference)),
       null_space_(std::move(null_space)),
       threshold_(singularity_threshold) {

@@ -114,7 +114,7 @@ std::optional<std::shared_ptr<const SplineJointPath>> smoothPathWithSpline(const
     // Subdivide every segment so the interpolating spline hugs the (valid) polyline more tightly.
     std::vector<VecX> refined{waypoints.front()};
     for (std::size_t i = 1; i < waypoints.size(); ++i) {
-      refined.push_back(0.5 * (waypoints[i - 1] + waypoints[i]));
+      refined.emplace_back(0.5 * (waypoints[i - 1] + waypoints[i]));
       refined.push_back(waypoints[i]);
     }
     waypoints = std::move(refined);

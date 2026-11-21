@@ -30,8 +30,8 @@ struct Body {
 /// The model is an immutable-by-default value type; mutators re-validate their input.
 class RobotModel {
  public:
-  RobotModel(std::string name, std::vector<Body> bodies, const SE3& T_flange_ee = SE3::Identity(),
-             const Vec3& gravity = Vec3(0.0, 0.0, -kStandardGravity));
+  RobotModel(std::string name, std::vector<Body> bodies, SE3 T_flange_ee = SE3::Identity(),
+             Vec3 gravity = Vec3(0.0, 0.0, -kStandardGravity));
 
   [[nodiscard]] const std::string& name() const { return name_; }
 

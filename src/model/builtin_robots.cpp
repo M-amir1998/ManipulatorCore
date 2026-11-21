@@ -64,8 +64,8 @@ RobotModel makePlanarChain(const std::string& name, const std::vector<double>& l
     b.collision = std::move(shapes);
     bodies.push_back(std::move(b));
   }
-  return RobotModel(name, std::move(bodies), SE3::fromTranslation(Vec3(lengths.back(), 0.0, 0.0)),
-                    Vec3(0.0, -kStandardGravity, 0.0));
+  return {name, std::move(bodies), SE3::fromTranslation(Vec3(lengths.back(), 0.0, 0.0)),
+          Vec3(0.0, -kStandardGravity, 0.0)};
 }
 
 }  // namespace

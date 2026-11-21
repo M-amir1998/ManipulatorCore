@@ -85,7 +85,7 @@ class RobotCollisionChecker {
   // Visits every checked pair that survives the broad phase with lower bound < cutoff(). The
   // visitor returns false to stop early.
   template <typename Visitor, typename Cutoff>
-  void forEachPair(const std::vector<PosedShape>& robot, Visitor&& visit, Cutoff&& cutoff) const;
+  void forEachPair(const std::vector<PosedShape>& robot, const Visitor& visit, const Cutoff& cutoff) const;
 
   RobotModel model_;
   std::vector<Shape> obstacles_;
