@@ -56,7 +56,11 @@ mc_add_module(
           kinematics/jacobian.cpp
           kinematics/poe.cpp
           kinematics/singularity.cpp
+          kinematics/differential_kinematics.cpp
+          kinematics/inverse_kinematics.cpp
+          kinematics/analytical_ik.cpp
           kinematics/workspace.cpp
+          optimization/objectives.cpp
   DEPS mc_model)
 
 # Umbrella target linking every module.

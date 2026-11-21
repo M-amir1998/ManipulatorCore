@@ -40,6 +40,7 @@ mc_add_test_suite(
   unit/test_interpolation.cpp
   unit/test_shapes.cpp
   unit/test_model.cpp
-  unit/test_kinematics.cpp)
+  unit/test_kinematics.cpp
+  unit/test_inverse_kinematics.cpp)
 
 mc_add_test_suite(mc_numerical_tests numerical numerical/test_lie_numerics.cpp)
