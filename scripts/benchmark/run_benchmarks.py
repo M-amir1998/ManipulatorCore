@@ -170,7 +170,7 @@ def main() -> int:
         + (f"pinned to logical CPU {args.cpu} |\n" if args.cpu is not None else "not pinned |\n"),
     ]
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text("\n".join(header) + "\n" + kernel_tables(kernels) + metrics, encoding="utf-8")
+    args.out.write_text("\n".join(header) + "\n" + kernel_tables(kernels) + metrics, encoding="utf-8", newline="\n")
     print(f"wrote {args.out}")
     return 0
 
