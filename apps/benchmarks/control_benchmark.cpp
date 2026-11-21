@@ -30,8 +30,10 @@ double controlCallMicros(Controller& c, const RobotModel& model) {
   double sink = 0.0;
   const auto t0 = std::chrono::steady_clock::now();
   const int repeats = 10;
+  double time = 0.0;
   for (int r = 0; r < repeats; ++r) {
-    for (const ControllerInput& in : inputs) {
+    for (ControllerInput& in : inputs) {
+      in.time = (time += 0.001);  // stateful controllers require non-decreasing time
       sink += c.computeTorque(in)(0);
     }
   }
@@ -109,7 +111,8 @@ std::string runControlBenchmark() {
      << "Protocol: the generic 7-DOF arm in the simulator (RK4, 1 ms, joint damping and torque saturation "
         "enabled; the controllers' models do not include the joint damping). All controllers of a table track the "
         "same reference; metrics are computed from the simulated motion. The settling time is measured on the "
-        "end-effector position error with a 1 mm band. Time per control call is measured separately on 200 "
+        "end-effector position error with a 1 mm band (0 s: the error never left the band; the full record length: it "
+        "never settled). Time per control call is measured separately on 200 "
         "states.\n\n";
   {
     VecX q1(7);

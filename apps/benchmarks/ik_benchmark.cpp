@@ -56,19 +56,25 @@ std::string runIkBenchmark(int targets) {
      << "Protocol: " << targets
      << " reachable targets per robot, generated as the forward kinematics of uniformly random joint "
         "configurations inside the limits (seed 2024). Every solve starts from an independent uniformly random "
-        "configuration (cold start). Tolerances: 0.1 mm and 1 mrad on the full 6-D pose. Iterations are averaged "
+        "configuration (cold start); the warm-start column instead seeds each solve within +-0.3 rad of a known "
+        "solution and measures local convergence. Tolerances: 0.1 mm and 1 mrad on the full 6-D pose. Iterations are "
+        "averaged "
         "over converged solves; errors are medians over all solves. A limit violation is a returned configuration "
         "outside the joint limits.\n\n";
 
   for (const RobotModel& model : {makeIndustrial6R(), makeRedundant7R()}) {
     md << "### " << model.name() << "\n\n"
-       << "| Method | Success | Mean iterations | Median position error | Median orientation error | Mean time per "
-          "solve | Limit violations |\n"
-       << "| --- | ---: | ---: | ---: | ---: | ---: | ---: |\n";
+       << "| Method | Success (cold start) | Success (warm start) | Mean iterations | Median position error | "
+          "Median orientation error | Mean time per solve | Limit violations |\n"
+       << "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |\n";
     Random target_rng(2024);
     std::vector<SE3> goals;
+    std::vector<VecX> warm_seeds;
     for (int k = 0; k < targets; ++k) {
-      goals.push_back(endEffectorPose(model, target_rng.uniformVector(model.lowerLimits(), model.upperLimits())));
+      const VecX q_true = target_rng.uniformVector(model.lowerLimits(), model.upperLimits());
+      goals.push_back(endEffectorPose(model, q_true));
+      warm_seeds.push_back(model.clampToLimits(
+          q_true + 0.3 * target_rng.uniformVector(-VecX::Ones(model.dof()), VecX::Ones(model.dof()))));
     }
     for (const Method& m : methods) {
       Random seed_rng(77);
@@ -101,7 +107,12 @@ std::string runIkBenchmark(int targets) {
         ori.push_back(r.orientation_error);
       }
       const double elapsed = secondsSince(t0);
+      int warm_success = 0;
+      for (std::size_t k = 0; k < goals.size(); ++k) {
+        warm_success += solveIK(model, goals[k], warm_seeds[k], m.options).converged() ? 1 : 0;
+      }
       md << "| " << m.label << " | " << fmt("%.1f %%", 100.0 * success / targets) << " | "
+         << fmt("%.1f %%", 100.0 * warm_success / targets) << " | "
          << (success > 0 ? fmt("%.1f", iterations / success) : std::string("-")) << " | " << fmt("%.2e m", median(pos))
          << " | " << fmt("%.2e rad", median(ori)) << " | " << fmt("%.0f us", 1e6 * elapsed / targets) << " | "
          << violations << " |\n";
@@ -109,9 +120,11 @@ std::string runIkBenchmark(int targets) {
     }
     md << "\n";
   }
-  md << "The Jacobian transpose converges linearly and is slow on full 6-D targets; the pseudoinverse is fast "
-        "but less robust from cold starts near singular configurations; damping trades a few iterations for "
-        "robustness; restarts address the local nature of all gradient-based methods.\n\n";
+  md << "Cold-start success is limited for every single-start method: from a random configuration the iterates "
+        "often end in local minima or against joint limits. Warm starts show the local behaviour (the Jacobian "
+        "transpose converges linearly and needs many iterations; damping costs a few iterations but tolerates "
+        "singular configurations), and random restarts address the local nature of all gradient-based methods. "
+        "Mean time per solve includes failed solves, which run to their iteration limit.\n\n";
   return md.str();
 }
 

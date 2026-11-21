@@ -6,6 +6,7 @@ if(TARGET benchmark)
 endif()
 
 # Google Benchmark kernels. Build in Release; results are only meaningful with optimizations on.
-add_executable(mc_benchmarks bench_main.cpp bench_geometry.cpp)
+add_executable(mc_benchmarks bench_main.cpp bench_geometry.cpp bench_kinematics_dynamics.cpp
+                             bench_collision_planning.cpp)
 target_link_libraries(mc_benchmarks PRIVATE ManipulatorCore::ManipulatorCore benchmark::benchmark)
 mc_set_project_warnings(mc_benchmarks)
