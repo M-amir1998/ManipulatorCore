@@ -32,6 +32,11 @@ mc_add_module(
   geometry
   SOURCES math/random.cpp
           math/linalg.cpp
+          geometry/so3.cpp
+          geometry/se3.cpp
+          geometry/rotation.cpp
+          geometry/interpolation.cpp
+          geometry/shapes.cpp
   DEPS mc_eigen)
 
 # Umbrella target linking every module.

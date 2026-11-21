@@ -1,5 +1,6 @@
 #pragma once
 
+#include "manipulatorcore/geometry/se3.hpp"
 #include "manipulatorcore/math/random.hpp"
 #include "manipulatorcore/math/types.hpp"
 
@@ -33,7 +34,28 @@ template <typename A, typename B>
   return ::testing::AssertionFailure() << os.str();
 }
 
+inline ::testing::AssertionResult poseNear(const char* expr_a, const char* expr_b, const char* expr_tol,
+                                           const SE3& a, const SE3& b, double tolerance) {
+  return matrixNear(expr_a, expr_b, expr_tol, a.matrix(), b.matrix(), tolerance);
+}
+
+/// Random rigid transform with translation in [-scale, scale]^3.
+inline SE3 randomPose(Random& rng, double scale = 1.0) {
+  return SE3::fromQuaternion(rng.uniformQuaternion(),
+                             Vec3(rng.uniform(-scale, scale), rng.uniform(-scale, scale), rng.uniform(-scale, scale)));
+}
+
+/// Random twist with components in [-scale, scale].
+inline Vec6 randomTwist(Random& rng, double scale = 1.0) {
+  Vec6 v;
+  for (Index i = 0; i < 6; ++i) {
+    v(i) = rng.uniform(-scale, scale);
+  }
+  return v;
+}
+
 }  // namespace mc::test
 
 #define EXPECT_MATRIX_NEAR(a, b, tol) EXPECT_PRED_FORMAT3(::mc::test::matrixNear, a, b, tol)
 #define ASSERT_MATRIX_NEAR(a, b, tol) ASSERT_PRED_FORMAT3(::mc::test::matrixNear, a, b, tol)
+#define EXPECT_POSE_NEAR(a, b, tol) EXPECT_PRED_FORMAT3(::mc::test::poseNear, a, b, tol)

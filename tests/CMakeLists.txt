@@ -33,5 +33,11 @@ endfunction()
 mc_add_test_suite(
   mc_unit_tests unit
   unit/test_random.cpp
-  unit/test_linalg.cpp)
+  unit/test_linalg.cpp
+  unit/test_so3.cpp
+  unit/test_se3.cpp
+  unit/test_rotation.cpp
+  unit/test_interpolation.cpp
+  unit/test_shapes.cpp)
 
+mc_add_test_suite(mc_numerical_tests numerical numerical/test_lie_numerics.cpp)
