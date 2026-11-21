@@ -39,6 +39,26 @@ mc_add_module(
           geometry/shapes.cpp
   DEPS mc_eigen)
 
+mc_add_module(
+  model
+  SOURCES model/joint.cpp
+          model/inertia.cpp
+          model/robot_model.cpp
+          model/dh.cpp
+          model/builtin_robots.cpp
+          model/xml_lite.cpp
+          model/urdf.cpp
+  DEPS mc_geometry)
+
+mc_add_module(
+  kinematics
+  SOURCES kinematics/forward_kinematics.cpp
+          kinematics/jacobian.cpp
+          kinematics/poe.cpp
+          kinematics/singularity.cpp
+          kinematics/workspace.cpp
+  DEPS mc_model)
+
 # Umbrella target linking every module.
 add_library(mc_all INTERFACE)
 add_library(ManipulatorCore::ManipulatorCore ALIAS mc_all)
