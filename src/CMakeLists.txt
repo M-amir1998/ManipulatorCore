@@ -78,6 +78,11 @@ mc_add_module(
           trajectory/time_parameterization.cpp
   DEPS mc_geometry)
 
+mc_add_module(
+  collision
+  SOURCES collision/distance.cpp collision/aabb.cpp collision/robot_collision.cpp
+  DEPS mc_kinematics)
+
 # Umbrella target linking every module.
 add_library(mc_all INTERFACE)
 add_library(ManipulatorCore::ManipulatorCore ALIAS mc_all)

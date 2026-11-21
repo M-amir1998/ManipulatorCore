@@ -114,7 +114,8 @@ RobotModel makeIndustrial6R() {
       {10.0, 0.065, {Vec3(0.0, 0.0, 0.0), Vec3(0.10, 0.0, 0.0), Vec3(0.10, 0.50, 0.0)}},
       {3.0, 0.055, {Vec3(0.0, 0.0, -0.12), Vec3(0.0, 0.0, 0.0)}},
       {1.5, 0.05, {Vec3(0.0, 0.0, 0.0), Vec3(0.0, 0.08, 0.0)}},
-      {0.8, 0.035, {Vec3(0.0, 0.0, -0.02), Vec3(0.0, 0.0, 0.05)}},
+      // Starts 0.10 m from the wrist centre so it can never touch body 4 (non-adjacent).
+      {0.8, 0.035, {Vec3(0.0, 0.0, 0.0), Vec3(0.0, 0.0, 0.05)}},
   }};
   const std::array<double, 6> armature = {0.5, 0.5, 0.3, 0.1, 0.1, 0.05};
   const std::array<double, 6> damping = {1.0, 1.0, 0.8, 0.3, 0.3, 0.1};
@@ -146,18 +147,21 @@ RobotModel makeRedundant7R() {
     JointLimits limits;
     double mass;
     double radius;
-    double length;  // capsule length of the body along its z axis [m]
+    double start;   // capsule start along the body z axis [m]
+    double length;  // capsule end along the body z axis [m]
     double armature;
     double damping;
   };
+  // The flange capsule starts 0.02 m above its joint so that it stays at least 0.01 m away from
+  // the forearm (bodies 4 and 6 are not adjacent) for every wrist angle.
   const std::array<Spec, 7> specs = {{
-      {0.15, Vec3::UnitZ(), {deg(-170), deg(170), 2.0, 10.0, 180.0}, 4.0, 0.07, 0.21, 0.20, 0.5},
-      {0.21, Vec3::UnitY(), {deg(-120), deg(120), 2.0, 10.0, 180.0}, 4.0, 0.07, 0.21, 0.20, 0.5},
-      {0.21, Vec3::UnitZ(), {deg(-170), deg(170), 2.2, 12.0, 110.0}, 3.0, 0.06, 0.21, 0.15, 0.4},
-      {0.21, Vec3::UnitY(), {deg(-120), deg(120), 2.2, 12.0, 110.0}, 2.7, 0.06, 0.20, 0.15, 0.4},
-      {0.20, Vec3::UnitZ(), {deg(-170), deg(170), 2.6, 15.0, 110.0}, 1.7, 0.05, 0.20, 0.08, 0.2},
-      {0.20, Vec3::UnitY(), {deg(-120), deg(120), 3.0, 18.0, 40.0}, 1.8, 0.05, 0.08, 0.08, 0.2},
-      {0.08, Vec3::UnitZ(), {deg(-175), deg(175), 3.0, 20.0, 40.0}, 0.7, 0.04, 0.10, 0.04, 0.1},
+      {0.15, Vec3::UnitZ(), {deg(-170), deg(170), 2.0, 10.0, 180.0}, 4.0, 0.07, 0.0, 0.21, 0.20, 0.5},
+      {0.21, Vec3::UnitY(), {deg(-120), deg(120), 2.0, 10.0, 180.0}, 4.0, 0.07, 0.0, 0.21, 0.20, 0.5},
+      {0.21, Vec3::UnitZ(), {deg(-170), deg(170), 2.2, 12.0, 110.0}, 3.0, 0.06, 0.0, 0.21, 0.15, 0.4},
+      {0.21, Vec3::UnitY(), {deg(-120), deg(120), 2.2, 12.0, 110.0}, 2.7, 0.06, 0.0, 0.20, 0.15, 0.4},
+      {0.20, Vec3::UnitZ(), {deg(-170), deg(170), 2.6, 15.0, 110.0}, 1.7, 0.05, 0.0, 0.20, 0.08, 0.2},
+      {0.20, Vec3::UnitY(), {deg(-120), deg(120), 3.0, 18.0, 40.0}, 1.8, 0.05, 0.0, 0.08, 0.08, 0.2},
+      {0.08, Vec3::UnitZ(), {deg(-175), deg(175), 3.0, 20.0, 40.0}, 0.7, 0.04, 0.02, 0.10, 0.04, 0.1},
   }};
   const std::array<const char*, 7> names = {"shoulder_yaw_link", "shoulder_pitch_link", "upper_arm_link", "elbow_link",
                                             "forearm_link",      "wrist_pitch_link",    "flange_link"};
@@ -168,7 +172,8 @@ RobotModel makeRedundant7R() {
     b.name = names[i];
     b.joint = revolute("joint" + std::to_string(i + 1), SE3::fromTranslation(Vec3(0.0, 0.0, s.offset)), s.axis,
                        s.limits, s.damping, s.armature);
-    auto [inertia, shapes] = segmentedLink(b.name, s.mass, s.radius, {Vec3::Zero(), Vec3(0.0, 0.0, s.length)});
+    auto [inertia, shapes] =
+        segmentedLink(b.name, s.mass, s.radius, {Vec3(0.0, 0.0, s.start), Vec3(0.0, 0.0, s.length)});
     b.inertia = inertia;
     b.collision = std::move(shapes);
     bodies.push_back(std::move(b));
