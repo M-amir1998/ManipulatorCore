@@ -92,6 +92,17 @@ mc_add_module(
           planning/scenarios.cpp
   DEPS mc_collision mc_trajectory)
 
+mc_add_module(
+  control
+  SOURCES control/controller.cpp control/joint_controllers.cpp control/task_space_controllers.cpp
+          control/metrics.cpp
+  DEPS mc_dynamics mc_trajectory)
+
+mc_add_module(
+  simulation
+  SOURCES simulation/simulator.cpp
+  DEPS mc_control)
+
 # Umbrella target linking every module.
 add_library(mc_all INTERFACE)
 add_library(ManipulatorCore::ManipulatorCore ALIAS mc_all)
