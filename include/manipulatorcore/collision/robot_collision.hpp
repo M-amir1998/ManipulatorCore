@@ -21,8 +21,11 @@ struct CollisionCheckerOptions {
   bool check_environment = true;
   /// The base is usually mounted on (and touching) the environment; exclude it by default.
   bool check_base_against_environment = false;
-  /// Distances below this margin count as collisions [m].
+  /// Robot-environment distances below this margin count as collisions [m].
   double safety_margin = 0.0;
+  /// Robot self-distances below this margin count as collisions [m]. Kept separate because the
+  /// built-in arms have small permanent clearances between non-adjacent wrist bodies.
+  double self_collision_margin = 0.0;
 };
 
 /// Which pair of objects a distance refers to.

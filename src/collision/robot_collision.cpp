@@ -39,6 +39,8 @@ void RobotCollisionChecker::addObstacle(Shape obstacle) {
 void RobotCollisionChecker::setOptions(const CollisionCheckerOptions& options) {
   require(std::isfinite(options.safety_margin) && options.safety_margin >= 0.0,
           "CollisionCheckerOptions: safety_margin must be finite and non-negative");
+  require(std::isfinite(options.self_collision_margin) && options.self_collision_margin >= 0.0,
+          "CollisionCheckerOptions: self_collision_margin must be finite and non-negative");
   options_ = options;
 }
 
@@ -146,17 +148,20 @@ void RobotCollisionChecker::forEachPair(const std::vector<PosedShape>& robot, Vi
 bool RobotCollisionChecker::isCollisionFree(const VecX& q) const {
   const std::vector<PosedShape> robot = poseRobot(q);
   bool free = true;
-  const double margin = options_.safety_margin;
+  const double env_margin = options_.safety_margin;
+  const double self_margin = options_.self_collision_margin;
+  const double cutoff = std::max(env_margin, self_margin);
   forEachPair(
       robot,
       [&](const CollisionPairInfo& info) {
+        const double margin = info.kind == CollisionPairInfo::Kind::Self ? self_margin : env_margin;
         if (info.result.distance < margin) {
           free = false;
           return false;
         }
         return true;
       },
-      [&] { return margin; });
+      [&] { return cutoff; });
   return free;
 }
 
