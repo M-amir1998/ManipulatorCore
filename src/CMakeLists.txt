@@ -68,6 +68,16 @@ mc_add_module(
   SOURCES dynamics/rigid_body_dynamics.cpp dynamics/planar_2r.cpp dynamics/integrators.cpp
   DEPS mc_kinematics)
 
+mc_add_module(
+  trajectory
+  SOURCES trajectory/joint_trajectory.cpp
+          trajectory/profiles.cpp
+          trajectory/polynomial.cpp
+          trajectory/spline.cpp
+          trajectory/cartesian.cpp
+          trajectory/time_parameterization.cpp
+  DEPS mc_geometry)
+
 # Umbrella target linking every module.
 add_library(mc_all INTERFACE)
 add_library(ManipulatorCore::ManipulatorCore ALIAS mc_all)
