@@ -36,6 +36,16 @@ PlannerSettings settings2D(std::uint64_t seed = 1) {
   return s;
 }
 
+// RRT* always spends its whole (anytime) budget with linear neighbour scans; keep that budget small
+// enough for unoptimized (Debug, sanitizer) builds.
+PlannerSettings settingsFor(const std::string& planner, std::uint64_t seed = 1) {
+  PlannerSettings s = settings2D(seed);
+  if (planner == "RRT*") {
+    s.max_iterations = 2500;
+  }
+  return s;
+}
+
 // ------------------------------------------------------------------------------------------------
 // Joint space and validation
 // ------------------------------------------------------------------------------------------------
@@ -71,7 +81,7 @@ class PlannerBehaviour : public ::testing::TestWithParam<std::string> {};
 TEST_P(PlannerBehaviour, OpenEnvironment) {
   const JointSpace space(Vec2(0, 0), Vec2(1, 1));
   const auto validator = std::make_shared<const MotionValidator>(space, [](const VecX&) { return true; }, 0.01);
-  auto planner = makePlanner(GetParam(), validator, settings2D());
+  auto planner = makePlanner(GetParam(), validator, settingsFor(GetParam()));
   const PlannerResult r = planner->solve(kAcrossWall);
   ASSERT_TRUE(r.success()) << toString(r.status);
   EXPECT_MATRIX_NEAR(r.path.front(), kAcrossWall.start, 0.0);
@@ -81,7 +91,7 @@ TEST_P(PlannerBehaviour, OpenEnvironment) {
 
 TEST_P(PlannerBehaviour, NarrowPassageYieldsValidPath) {
   const auto validator = wallWorld(0.08);
-  auto planner = makePlanner(GetParam(), validator, settings2D(3));
+  auto planner = makePlanner(GetParam(), validator, settingsFor(GetParam(), 3));
   const PlannerResult r = planner->solve(kAcrossWall);
   ASSERT_TRUE(r.success()) << GetParam() << ": " << toString(r.status);
   EXPECT_TRUE(validator->isPathValid(r.path));
@@ -105,8 +115,8 @@ TEST_P(PlannerBehaviour, BlockedEnvironmentFailsGracefully) {
 
 TEST_P(PlannerBehaviour, DeterministicForSeed) {
   const auto validator = wallWorld(0.15);
-  auto a = makePlanner(GetParam(), validator, settings2D(11));
-  auto b = makePlanner(GetParam(), validator, settings2D(11));
+  auto a = makePlanner(GetParam(), validator, settingsFor(GetParam(), 11));
+  auto b = makePlanner(GetParam(), validator, settingsFor(GetParam(), 11));
   const PlannerResult ra = a->solve(kAcrossWall);
   const PlannerResult rb = b->solve(kAcrossWall);
   ASSERT_TRUE(ra.success());
@@ -119,7 +129,7 @@ TEST_P(PlannerBehaviour, DeterministicForSeed) {
 
 TEST_P(PlannerBehaviour, InvalidStartAndGoal) {
   const auto validator = wallWorld(0.0);
-  auto planner = makePlanner(GetParam(), validator, settings2D());
+  auto planner = makePlanner(GetParam(), validator, settingsFor(GetParam()));
   EXPECT_EQ(planner->solve({Vec2(0.5, 0.5), {Vec2(0.9, 0.9)}}).status, PlannerStatus::InvalidStart);
   EXPECT_EQ(planner->solve({Vec2(0.1, 0.1), {Vec2(0.5, 0.2)}}).status, PlannerStatus::InvalidGoal);
 }
@@ -137,7 +147,7 @@ TEST(RRTStar, MoreIterationsDoNotIncreaseCost) {
   PlannerSettings few = settings2D(5);
   few.max_iterations = 600;
   PlannerSettings many = few;
-  many.max_iterations = 6000;
+  many.max_iterations = 3000;
   const PlannerResult a = RRTStarPlanner(validator, few).solve(kAcrossWall);
   const PlannerResult b = RRTStarPlanner(validator, many).solve(kAcrossWall);
   ASSERT_TRUE(a.success());
@@ -153,7 +163,7 @@ TEST(RRTStar, ShorterThanRRTOnAverage) {
   double star = 0.0;
   for (std::uint64_t seed = 1; seed <= 5; ++seed) {
     PlannerSettings s = settings2D(seed);
-    s.max_iterations = 3000;
+    s.max_iterations = 2000;
     rrt += RRTPlanner(validator, s).solve(kAcrossWall).path_length;
     star += RRTStarPlanner(validator, s).solve(kAcrossWall).path_length;
   }
