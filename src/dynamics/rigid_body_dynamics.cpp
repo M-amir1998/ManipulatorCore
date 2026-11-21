@@ -228,7 +228,8 @@ MatX coriolisMatrix(const RobotModel& model, const VecX& q, const VecX& qd) {
       double c = 0.0;
       for (int k = 0; k < n; ++k) {
         const auto uk = static_cast<std::size_t>(k);
-        c += 0.5 * (dM[uk](i, j) + dM[static_cast<std::size_t>(j)](i, k) - dM[static_cast<std::size_t>(i)](j, k)) * qd(k);
+        c += 0.5 * (dM[uk](i, j) + dM[static_cast<std::size_t>(j)](i, k) - dM[static_cast<std::size_t>(i)](j, k)) *
+             qd(k);
       }
       C(i, j) = c;
     }

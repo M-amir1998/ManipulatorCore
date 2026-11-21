@@ -14,8 +14,7 @@ namespace mc {
 // Elementary queries
 // ------------------------------------------------------------------------------------------------
 
-double closestPointsSegmentSegment(const Vec3& p1, const Vec3& q1, const Vec3& p2, const Vec3& q2, Vec3& c1,
-                                   Vec3& c2) {
+double closestPointsSegmentSegment(const Vec3& p1, const Vec3& q1, const Vec3& p2, const Vec3& q2, Vec3& c1, Vec3& c2) {
   constexpr double kEps = 1e-18;
   const Vec3 d1 = q1 - p1;
   const Vec3 d2 = q2 - p2;
@@ -233,8 +232,8 @@ bool closestOnSimplex(std::vector<SimplexVertex>& S, Vec3& v, std::array<double,
 
 }  // namespace
 
-GjkResult gjkDistance(const SupportFunction& support_a, const SupportFunction& support_b,
-                      const Vec3& initial_direction, int max_iterations) {
+GjkResult gjkDistance(const SupportFunction& support_a, const SupportFunction& support_b, const Vec3& initial_direction,
+                      int max_iterations) {
   constexpr double kRelTol = 1e-12;
   constexpr double kAbsTolSq = 1e-24;
   GjkResult result;
@@ -434,8 +433,7 @@ DistanceResult roundedVsBox(const Core& a, const Core& b) {
 
 DistanceResult boxVsBox(const Core& a, const Core& b) {
   const GjkResult g = gjkDistance([&](const Vec3& d) { return coreSupport(a, d); },
-                                  [&](const Vec3& d) { return coreSupport(b, d); },
-                                  coreCenter(a) - coreCenter(b));
+                                  [&](const Vec3& d) { return coreSupport(b, d); }, coreCenter(a) - coreCenter(b));
   DistanceResult r;
   if (!g.intersecting && g.distance > 1e-12) {
     r.distance = g.distance;

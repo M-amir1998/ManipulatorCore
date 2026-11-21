@@ -17,12 +17,12 @@ namespace mc {
 
 /// Singular values and derived rank metrics of a matrix.
 struct SvdMetrics {
-  VecX singular_values;          ///< Descending order.
-  int rank = 0;                  ///< Number of singular values above the tolerance.
-  double tolerance = 0.0;        ///< Tolerance used for the rank decision.
-  double sigma_max = 0.0;        ///< Largest singular value.
-  double sigma_min = 0.0;        ///< Smallest of the min(rows, cols) singular values.
-  double condition_number = 0.0; ///< sigma_max / sigma_min; +infinity if sigma_min == 0.
+  VecX singular_values;           ///< Descending order.
+  int rank = 0;                   ///< Number of singular values above the tolerance.
+  double tolerance = 0.0;         ///< Tolerance used for the rank decision.
+  double sigma_max = 0.0;         ///< Largest singular value.
+  double sigma_min = 0.0;         ///< Smallest of the min(rows, cols) singular values.
+  double condition_number = 0.0;  ///< sigma_max / sigma_min; +infinity if sigma_min == 0.
 };
 
 /// Computes singular values and rank metrics. A negative @p tolerance selects
@@ -59,7 +59,6 @@ struct SvdMetrics {
 /// Central-difference Jacobian of f at x: column j is (f(x + h e_j) - f(x - h e_j)) / (2 h).
 /// Truncation error is O(h^2); round-off error is O(eps / h). h ~ 1e-6 balances both for
 /// smooth functions with O(1) derivatives.
-[[nodiscard]] MatX numericalJacobian(const std::function<VecX(const VecX&)>& f, const VecX& x,
-                                     double step = 1e-6);
+[[nodiscard]] MatX numericalJacobian(const std::function<VecX(const VecX&)>& f, const VecX& x, double step = 1e-6);
 
 }  // namespace mc

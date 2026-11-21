@@ -10,14 +10,14 @@
 namespace mc {
 
 struct TrackingMetrics {
-  double joint_rmse = 0.0;         ///< sqrt(mean over samples of |q_d - q|^2 / n) [rad]
-  double max_joint_error = 0.0;    ///< max |q_d - q|_inf [rad]
-  double position_rmse = 0.0;      ///< end-effector position RMSE [m]
-  double orientation_rmse = 0.0;   ///< end-effector orientation RMSE (geodesic angle) [rad]
-  double control_effort = 0.0;     ///< integral of |tau|^2 dt [N^2·m^2·s]
-  double rms_torque = 0.0;         ///< sqrt(mean |tau|^2 / n) [N·m]
-  double peak_torque = 0.0;        ///< max |tau_i| [N·m]
-  double settling_time = 0.0;      ///< first time after which the position error stays below the band [s]
+  double joint_rmse = 0.0;        ///< sqrt(mean over samples of |q_d - q|^2 / n) [rad]
+  double max_joint_error = 0.0;   ///< max |q_d - q|_inf [rad]
+  double position_rmse = 0.0;     ///< end-effector position RMSE [m]
+  double orientation_rmse = 0.0;  ///< end-effector orientation RMSE (geodesic angle) [rad]
+  double control_effort = 0.0;    ///< integral of |tau|^2 dt [N^2·m^2·s]
+  double rms_torque = 0.0;        ///< sqrt(mean |tau|^2 / n) [N·m]
+  double peak_torque = 0.0;       ///< max |tau_i| [N·m]
+  double settling_time = 0.0;     ///< first time after which the position error stays below the band [s]
 };
 
 /// Inputs sampled on the same time grid. Position and orientation errors may be empty.

@@ -98,8 +98,7 @@ TEST(Inertia, TransformedPreservesSpatialInertia) {
   const Inertia I = Inertia::solidBox(1.5, Vec3(0.1, 0.4, 0.2), Vec3(0.2, 0.1, -0.1));
   const SE3 T_a_body = test::randomPose(rng);
   const Mat6 Ad = T_a_body.inverse().adjoint();
-  EXPECT_MATRIX_NEAR(I.transformed(T_a_body).spatialMatrix(), (Ad.transpose() * I.spatialMatrix() * Ad).eval(),
-                     1e-12);
+  EXPECT_MATRIX_NEAR(I.transformed(T_a_body).spatialMatrix(), (Ad.transpose() * I.spatialMatrix() * Ad).eval(), 1e-12);
 }
 
 TEST(Inertia, ValidationRejectsUnphysicalParameters) {
@@ -142,9 +141,7 @@ TEST(RobotModel, BuiltinRobotsAreValid) {
   EXPECT_EQ(makeRedundant7R().bodyIndex("missing"), -1);
 }
 
-TEST(RobotModel, RejectsEmptyModels) {
-  EXPECT_THROW(RobotModel("empty", {}), InvalidArgument);
-}
+TEST(RobotModel, RejectsEmptyModels) { EXPECT_THROW(RobotModel("empty", {}), InvalidArgument); }
 
 TEST(DH, StandardTransformMatchesDefinition) {
   DHRow row;
@@ -204,8 +201,7 @@ TEST_P(DHEquivalence, ChainModelReproducesDirectDHProduct) {
   }
 }
 
-INSTANTIATE_TEST_SUITE_P(Conventions, DHEquivalence,
-                         ::testing::Values(DHConvention::Standard, DHConvention::Modified));
+INSTANTIATE_TEST_SUITE_P(Conventions, DHEquivalence, ::testing::Values(DHConvention::Standard, DHConvention::Modified));
 
 TEST(DH, Industrial6RMatchesItsDHTable) {
   const RobotModel model = makeIndustrial6R();

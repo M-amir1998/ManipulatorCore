@@ -46,8 +46,8 @@ TEST(Control, OperationalSpaceTaskAccelerationEqualsCommand) {
   Random rng(403);
   const VecX q = redundant7RHome() + test::randomVector(7, rng, 0.2);
   const VecX qd = test::randomVector(7, rng, 0.5);
-  const SE3 target = endEffectorPose(model, q) * SE3(Eigen::AngleAxisd(0.1, Vec3::UnitX()).toRotationMatrix(),
-                                                     Vec3(0.02, -0.01, 0.03));
+  const SE3 target = endEffectorPose(model, q) *
+                     SE3(Eigen::AngleAxisd(0.1, Vec3::UnitX()).toRotationMatrix(), Vec3(0.02, -0.01, 0.03));
   const Mat6 kp = diagonalGain(100.0, 200.0);
   const Mat6 kd = diagonalGain(20.0, 28.0);
   NullSpaceTask posture;

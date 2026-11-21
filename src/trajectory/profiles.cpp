@@ -29,13 +29,9 @@ PolynomialProfile::PolynomialProfile(double distance, double duration, bool quin
   requirePositive(duration, "duration");
 }
 
-PolynomialProfile PolynomialProfile::cubic(double distance, double duration) {
-  return {distance, duration, false};
-}
+PolynomialProfile PolynomialProfile::cubic(double distance, double duration) { return {distance, duration, false}; }
 
-PolynomialProfile PolynomialProfile::quintic(double distance, double duration) {
-  return {distance, duration, true};
-}
+PolynomialProfile PolynomialProfile::quintic(double distance, double duration) { return {distance, duration, true}; }
 
 ProfileSample PolynomialProfile::sample(double t) const {
   const double T = duration_;

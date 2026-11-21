@@ -12,10 +12,10 @@ namespace mc {
 
 enum class NullSpaceObjective {
   None,
-  JointCentering,       ///< H = 1/2 sum(((q_i - c_i) / range_i)^2)
-  JointLimitBarrier,    ///< Zghal et al.: H = sum(range_i^2 / (4 (u_i - q_i)(q_i - l_i))) / n
-  JointLimitActivation, ///< C1 quadratic penalty active only near the limits
-  Manipulability        ///< H = -w(q), Yoshikawa manipulability of the geometric Jacobian
+  JointCentering,        ///< H = 1/2 sum(((q_i - c_i) / range_i)^2)
+  JointLimitBarrier,     ///< Zghal et al.: H = sum(range_i^2 / (4 (u_i - q_i)(q_i - l_i))) / n
+  JointLimitActivation,  ///< C1 quadratic penalty active only near the limits
+  Manipulability         ///< H = -w(q), Yoshikawa manipulability of the geometric Jacobian
 };
 
 [[nodiscard]] const char* toString(NullSpaceObjective objective);
@@ -46,7 +46,6 @@ struct ObjectiveValue {
                                                      bool translational_only = false);
 
 /// Dispatches to the objective selected by @p objective. NullSpaceObjective::None returns zero.
-[[nodiscard]] ObjectiveValue evaluateObjective(NullSpaceObjective objective, const RobotModel& model,
-                                               const VecX& q);
+[[nodiscard]] ObjectiveValue evaluateObjective(NullSpaceObjective objective, const RobotModel& model, const VecX& q);
 
 }  // namespace mc

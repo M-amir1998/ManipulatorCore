@@ -32,9 +32,7 @@ namespace {
 
 using Clock = std::chrono::steady_clock;
 
-double secondsSince(Clock::time_point t0) {
-  return std::chrono::duration<double>(Clock::now() - t0).count();
-}
+double secondsSince(Clock::time_point t0) { return std::chrono::duration<double>(Clock::now() - t0).count(); }
 
 /// Exploration tree with parent pointers, path costs and child lists (for RRT* cost updates).
 struct Tree {
@@ -118,8 +116,8 @@ bool MotionPlanner::checkProblem(const PlanningProblem& problem, PlannerResult& 
     result.status = PlannerStatus::InvalidStart;
     return false;
   }
-  const bool any_goal_valid = std::any_of(problem.goals.begin(), problem.goals.end(),
-                                          [&](const VecX& g) { return validator_->isValid(g); });
+  const bool any_goal_valid =
+      std::any_of(problem.goals.begin(), problem.goals.end(), [&](const VecX& g) { return validator_->isValid(g); });
   if (!any_goal_valid) {
     result.status = PlannerStatus::InvalidGoal;
     return false;
@@ -321,9 +319,8 @@ PlannerResult RRTStarPlanner::solve(const PlanningProblem& problem) {
     // Choose the parent minimizing cost-to-come; edges are validated lazily in cost order.
     std::vector<std::pair<double, int>> candidates;
     for (const int i : near) {
-      candidates.emplace_back(tree.cost[static_cast<std::size_t>(i)] +
-                                  space.distance(tree.q[static_cast<std::size_t>(i)], q_new),
-                              i);
+      candidates.emplace_back(
+          tree.cost[static_cast<std::size_t>(i)] + space.distance(tree.q[static_cast<std::size_t>(i)], q_new), i);
     }
     std::sort(candidates.begin(), candidates.end());
     int parent = -1;
@@ -364,9 +361,9 @@ PlannerResult RRTStarPlanner::solve(const PlanningProblem& problem) {
   // Best goal connection under the final (rewired) costs.
   double best_cost = std::numeric_limits<double>::infinity();
   for (const GoalLink& link : goal_links) {
-    const double c = tree.cost[static_cast<std::size_t>(link.node)] +
-                     space.distance(tree.q[static_cast<std::size_t>(link.node)],
-                                    problem.goals[static_cast<std::size_t>(link.goal)]);
+    const double c =
+        tree.cost[static_cast<std::size_t>(link.node)] +
+        space.distance(tree.q[static_cast<std::size_t>(link.node)], problem.goals[static_cast<std::size_t>(link.goal)]);
     if (c < best_cost) {
       best_cost = c;
       result.path = tree.pathTo(link.node);

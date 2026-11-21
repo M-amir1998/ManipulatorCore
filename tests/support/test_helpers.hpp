@@ -14,11 +14,10 @@ namespace mc::test {
 /// GoogleTest predicate: max-abs difference between two matrices is within tolerance.
 template <typename A, typename B>
 ::testing::AssertionResult matrixNear(const char* expr_a, const char* expr_b, const char* /*expr_tol*/,
-                                      const Eigen::MatrixBase<A>& a, const Eigen::MatrixBase<B>& b,
-                                      double tolerance) {
+                                      const Eigen::MatrixBase<A>& a, const Eigen::MatrixBase<B>& b, double tolerance) {
   if (a.rows() != b.rows() || a.cols() != b.cols()) {
-    return ::testing::AssertionFailure() << expr_a << " and " << expr_b << " have different shapes (" << a.rows()
-                                         << "x" << a.cols() << " vs " << b.rows() << "x" << b.cols() << ")";
+    return ::testing::AssertionFailure() << expr_a << " and " << expr_b << " have different shapes (" << a.rows() << "x"
+                                         << a.cols() << " vs " << b.rows() << "x" << b.cols() << ")";
   }
   const MatX diff = (a.template cast<double>() - b.template cast<double>()).cwiseAbs();
   const double err = diff.size() == 0 ? 0.0 : diff.maxCoeff();
@@ -34,8 +33,8 @@ template <typename A, typename B>
   return ::testing::AssertionFailure() << os.str();
 }
 
-inline ::testing::AssertionResult poseNear(const char* expr_a, const char* expr_b, const char* expr_tol,
-                                           const SE3& a, const SE3& b, double tolerance) {
+inline ::testing::AssertionResult poseNear(const char* expr_a, const char* expr_b, const char* expr_tol, const SE3& a,
+                                           const SE3& b, double tolerance) {
   return matrixNear(expr_a, expr_b, expr_tol, a.matrix(), b.matrix(), tolerance);
 }
 

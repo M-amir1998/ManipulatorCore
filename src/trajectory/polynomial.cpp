@@ -192,8 +192,8 @@ int CompositeTrajectory::dof() const { return segments_.front()->dof(); }
 
 TrajectoryPoint CompositeTrajectory::sample(double t) const {
   t = std::clamp(t, 0.0, duration());
-  std::size_t i = static_cast<std::size_t>(std::upper_bound(start_times_.begin(), start_times_.end(), t) -
-                                           start_times_.begin());
+  std::size_t i =
+      static_cast<std::size_t>(std::upper_bound(start_times_.begin(), start_times_.end(), t) - start_times_.begin());
   i = std::clamp<std::size_t>(i, 1, segments_.size()) - 1;
   TrajectoryPoint p = segments_[i]->sample(t - start_times_[i]);
   p.time = t;

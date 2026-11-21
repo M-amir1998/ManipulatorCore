@@ -7,10 +7,10 @@
 #include <algorithm>
 #include <array>
 #include <charconv>
-#include <optional>
 #include <fstream>
 #include <locale>
 #include <map>
+#include <optional>
 #include <sstream>
 #include <variant>
 
@@ -222,8 +222,8 @@ std::string toURDF(const RobotModel& model, const UrdfExportOptions& options) {
        << "      <origin xyz=\"" << vec3(I.com) << "\" rpy=\"0 0 0\"/>\n"
        << "      <mass value=\"" << num(I.mass) << "\"/>\n"
        << "      <inertia ixx=\"" << num(I.inertia_com(0, 0)) << "\" ixy=\"" << num(I.inertia_com(0, 1)) << "\" ixz=\""
-       << num(I.inertia_com(0, 2)) << "\" iyy=\"" << num(I.inertia_com(1, 1)) << "\" iyz=\""
-       << num(I.inertia_com(1, 2)) << "\" izz=\"" << num(I.inertia_com(2, 2)) << "\"/>\n"
+       << num(I.inertia_com(0, 2)) << "\" iyy=\"" << num(I.inertia_com(1, 1)) << "\" iyz=\"" << num(I.inertia_com(1, 2))
+       << "\" izz=\"" << num(I.inertia_com(2, 2)) << "\"/>\n"
        << "    </inertial>\n";
     writeLinkGeometry(os, b.collision, options.include_visuals);
     os << "  </link>\n";
@@ -347,8 +347,8 @@ RobotModel fromURDF(std::string_view urdf_xml, const UrdfImportOptions& options)
       joint.name = uj.name;
       joint.type = uj.type == "prismatic" ? JointType::Prismatic : JointType::Revolute;
       joint.origin = pending * origin;
-      const Vec3 axis = je.child("axis") != nullptr ? vec3Attribute(*je.child("axis"), "xyz", Vec3::UnitX(), uj.name)
-                                                     : Vec3::UnitX();
+      const Vec3 axis =
+          je.child("axis") != nullptr ? vec3Attribute(*je.child("axis"), "xyz", Vec3::UnitX(), uj.name) : Vec3::UnitX();
       require(axis.norm() > 1e-12, "URDF: joint '" + uj.name + "' has a zero axis");
       joint.axis = axis.normalized();
       joint.limits.velocity = options.default_velocity_limit;

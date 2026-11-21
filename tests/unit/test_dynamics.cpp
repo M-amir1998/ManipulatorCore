@@ -171,9 +171,9 @@ TEST(Dynamics, MasslessDistalBodyIsRejectedByForwardDynamics) {
   bodies[1].inertia = Inertia{};
   const RobotModel bad("massless", bodies, model.toolTransform(), model.gravity());
   EXPECT_THROW((void)forwardDynamics(bad, Vec2(0.1, 0.2), Vec2::Zero(), Vec2::Zero()), InvalidArgument);
-  EXPECT_THROW((void)forwardDynamics(bad, Vec2(0.1, 0.2), Vec2::Zero(), Vec2::Zero(),
-                                     ForwardDynamicsMethod::CompositeRigidBody),
-               InvalidArgument);
+  EXPECT_THROW(
+      (void)forwardDynamics(bad, Vec2(0.1, 0.2), Vec2::Zero(), Vec2::Zero(), ForwardDynamicsMethod::CompositeRigidBody),
+      InvalidArgument);
 }
 
 TEST(Dynamics, InputValidation) {

@@ -146,8 +146,7 @@ IKResult solveIK(const RobotModel& model, const SE3& target, const VecX& seed, c
   IKResult result;
   result.status = IKStatus::MaxIterations;
   ErrorTerms err = evaluate(q);
-  const bool has_objective =
-      options.null_space_objective != NullSpaceObjective::None && options.null_space_gain > 0.0;
+  const bool has_objective = options.null_space_objective != NullSpaceObjective::None && options.null_space_gain > 0.0;
   int refinement_left = has_objective ? options.null_space_refinement_iterations : 0;
   int iteration = 0;
   for (; iteration < options.max_iterations; ++iteration) {
@@ -280,9 +279,8 @@ std::vector<IKResult> solveIKMultiStart(const RobotModel& model, const SE3& targ
       break;
     }
   }
-  std::stable_sort(solutions.begin(), solutions.end(), [&](const IKResult& a, const IKResult& b) {
-    return (a.q - seed).norm() < (b.q - seed).norm();
-  });
+  std::stable_sort(solutions.begin(), solutions.end(),
+                   [&](const IKResult& a, const IKResult& b) { return (a.q - seed).norm() < (b.q - seed).norm(); });
   return solutions;
 }
 

@@ -74,14 +74,16 @@ std::vector<RobotCollisionChecker::PosedShape> RobotCollisionChecker::poseRobot(
   std::vector<PosedShape> shapes;
   const auto& base = model_.baseCollision();
   for (std::size_t k = 0; k < base.size(); ++k) {
-    shapes.push_back({-1, static_cast<int>(k), &base[k].geometry, base[k].pose, AABB::of(base[k].geometry, base[k].pose)});
+    shapes.push_back(
+        {-1, static_cast<int>(k), &base[k].geometry, base[k].pose, AABB::of(base[k].geometry, base[k].pose)});
   }
   for (int i = 0; i < model_.dof(); ++i) {
     const auto& body_shapes = model_.body(i).collision;
     const SE3& T = state.T_base_body[static_cast<std::size_t>(i)];
     for (std::size_t k = 0; k < body_shapes.size(); ++k) {
       const SE3 pose = T * body_shapes[k].pose;
-      shapes.push_back({i, static_cast<int>(k), &body_shapes[k].geometry, pose, AABB::of(body_shapes[k].geometry, pose)});
+      shapes.push_back(
+          {i, static_cast<int>(k), &body_shapes[k].geometry, pose, AABB::of(body_shapes[k].geometry, pose)});
     }
   }
   return shapes;
@@ -190,8 +192,9 @@ std::vector<CollisionPairInfo> RobotCollisionChecker::pairDistances(const VecX& 
         return true;
       },
       [&] { return report_distance; });
-  std::sort(out.begin(), out.end(),
-            [](const CollisionPairInfo& a, const CollisionPairInfo& b) { return a.result.distance < b.result.distance; });
+  std::sort(out.begin(), out.end(), [](const CollisionPairInfo& a, const CollisionPairInfo& b) {
+    return a.result.distance < b.result.distance;
+  });
   return out;
 }
 

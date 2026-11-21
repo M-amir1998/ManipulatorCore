@@ -14,9 +14,8 @@ namespace mc {
 namespace {
 
 std::shared_ptr<const MotionValidator> scenarioValidator(const RobotCollisionChecker& checker) {
-  return std::make_shared<const MotionValidator>(JointSpace::fromModel(checker.model()),
-                                                 [&checker](const VecX& q) { return checker.isCollisionFree(q); },
-                                                 0.02);
+  return std::make_shared<const MotionValidator>(
+      JointSpace::fromModel(checker.model()), [&checker](const VecX& q) { return checker.isCollisionFree(q); }, 0.02);
 }
 
 TEST(PlanningIntegration, RRTConnectSolvesAllScenarios) {
@@ -29,8 +28,8 @@ TEST(PlanningIntegration, RRTConnectSolvesAllScenarios) {
     const PlannerResult r = planner.solve({s.start, {s.goal}});
     ASSERT_TRUE(r.success()) << s.name << ": " << toString(r.status);
     // Collision-free planned path remains collision free when re-checked at a finer resolution.
-    const MotionValidator fine(JointSpace::fromModel(s.robot),
-                               [&checker](const VecX& q) { return checker.isCollisionFree(q); }, 0.005);
+    const MotionValidator fine(
+        JointSpace::fromModel(s.robot), [&checker](const VecX& q) { return checker.isCollisionFree(q); }, 0.005);
     EXPECT_TRUE(fine.isPathValid(r.path)) << s.name;
   }
 }

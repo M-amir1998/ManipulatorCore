@@ -26,7 +26,9 @@ EnergyTrace simulatePassive(const RobotModel& model, Integrator integrator, cons
     return forwardDynamics(model, q, qd, zero);
   };
   JointState s{q0, zero};
-  const auto energy = [&](const JointState& x) { return kineticEnergy(model, x.q, x.qd) + potentialEnergy(model, x.q); };
+  const auto energy = [&](const JointState& x) {
+    return kineticEnergy(model, x.q, x.qd) + potentialEnergy(model, x.q);
+  };
   EnergyTrace trace;
   trace.initial = energy(s);
   const int steps = static_cast<int>(std::lround(duration / dt));

@@ -35,26 +35,24 @@ void validateShape(const Shape& shape) {
   requireFinite(shape.pose.rotation(), "Shape pose rotation");
   requireFinite(shape.pose.translation(), "Shape pose translation");
   require(isRotationMatrix(shape.pose.rotation(), 1e-6), "Shape pose rotation is not in SO(3)");
-  std::visit(Overloaded{
-                 [](const Sphere& s) {
-                   require(std::isfinite(s.radius) && s.radius > 0.0, "Sphere radius must be positive");
-                 },
-                 [](const Capsule& c) {
-                   require(std::isfinite(c.radius) && c.radius > 0.0, "Capsule radius must be positive");
-                   require(std::isfinite(c.half_length) && c.half_length >= 0.0,
-                           "Capsule half_length must be non-negative");
-                 },
-                 [](const Box& b) {
-                   require(b.half_extents.allFinite() && (b.half_extents.array() > 0.0).all(),
-                           "Box half extents must be positive");
-                 },
-                 [](const HalfSpace& h) {
-                   require(h.normal.allFinite() && std::abs(h.normal.norm() - 1.0) < 1e-9,
-                           "HalfSpace normal must be a unit vector");
-                   require(std::isfinite(h.offset), "HalfSpace offset must be finite");
-                 },
-             },
-             shape.geometry);
+  std::visit(
+      Overloaded{
+          [](const Sphere& s) { require(std::isfinite(s.radius) && s.radius > 0.0, "Sphere radius must be positive"); },
+          [](const Capsule& c) {
+            require(std::isfinite(c.radius) && c.radius > 0.0, "Capsule radius must be positive");
+            require(std::isfinite(c.half_length) && c.half_length >= 0.0, "Capsule half_length must be non-negative");
+          },
+          [](const Box& b) {
+            require(b.half_extents.allFinite() && (b.half_extents.array() > 0.0).all(),
+                    "Box half extents must be positive");
+          },
+          [](const HalfSpace& h) {
+            require(h.normal.allFinite() && std::abs(h.normal.norm() - 1.0) < 1e-9,
+                    "HalfSpace normal must be a unit vector");
+            require(std::isfinite(h.offset), "HalfSpace offset must be finite");
+          },
+      },
+      shape.geometry);
 }
 
 Shape makeSphere(const Vec3& center, double radius, std::string name) {

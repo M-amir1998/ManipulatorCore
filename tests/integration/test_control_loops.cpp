@@ -114,7 +114,8 @@ TEST(ControlLoops, TaskSpaceControllersReachTargetPose) {
   posture.stiffness = 10.0;
   posture.damping = 2.0;
 
-  TaskSpacePDController pd(model, diagonalGain(150, 1500), diagonalGain(15, 120), constantPoseReference(target), posture);
+  TaskSpacePDController pd(model, diagonalGain(150, 1500), diagonalGain(15, 120), constantPoseReference(target),
+                           posture);
   OperationalSpaceController osc(model, diagonalGain(100, 100), diagonalGain(20, 20), constantPoseReference(target),
                                  posture);
   for (Controller* c : std::initializer_list<Controller*>{&pd, &osc}) {
@@ -140,7 +141,8 @@ TEST(ControlLoops, OperationalSpaceTracksCartesianLine) {
   sim.run(osc, 2.0);
   double worst = 0.0;
   for (std::size_t k = 0; k < sim.log().time.size(); ++k) {
-    worst = std::max(worst, (traj->sample(sim.log().time[k]).pose.translation() - sim.log().ee_pose[k].translation()).norm());
+    worst = std::max(worst,
+                     (traj->sample(sim.log().time[k]).pose.translation() - sim.log().ee_pose[k].translation()).norm());
   }
   EXPECT_LT(worst, 2e-3);
 }

@@ -80,12 +80,12 @@ class StraightJointPath final : public JointPath {
 };
 
 struct TimeParameterizationOptions {
-  int grid_segments = 1000;       ///< nominal number of uniform path segments
+  int grid_segments = 1000;                  ///< nominal number of uniform path segments
   int segments_per_breakpoint_interval = 6;  ///< minimum segments between consecutive path breakpoints
-  int max_grid_segments = 20000;  ///< upper bound on the refined grid
-  double velocity_scale = 1.0;    ///< fraction of the velocity limits to use, (0, 1]
+  int max_grid_segments = 20000;             ///< upper bound on the refined grid
+  double velocity_scale = 1.0;               ///< fraction of the velocity limits to use, (0, 1]
   double acceleration_scale = 1.0;
-  double safety_margin = 0.01;    ///< limits are tightened by this fraction (discretization error)
+  double safety_margin = 0.01;  ///< limits are tightened by this fraction (discretization error)
   /// After solving, the trajectory is sampled at this many points per grid segment; if any sampled
   /// velocity/acceleration exceeds its limit, the whole trajectory is uniformly slowed down
   /// (velocity scales with 1/k, acceleration with 1/k^2) until it does not. 0 disables the check.
@@ -108,8 +108,8 @@ class TimeOptimalTrajectory final : public JointTrajectory {
  private:
   [[nodiscard]] TrajectoryPoint sampleUnscaled(double t) const;
   double time_scale_ = 1.0;
-  friend TimeOptimalTrajectory timeOptimalParameterization(std::shared_ptr<const JointPath>, const VecX&,
-                                                          const VecX&, const TimeParameterizationOptions&);
+  friend TimeOptimalTrajectory timeOptimalParameterization(std::shared_ptr<const JointPath>, const VecX&, const VecX&,
+                                                           const TimeParameterizationOptions&);
   TimeOptimalTrajectory() = default;
   std::shared_ptr<const JointPath> path_;
   std::vector<double> s_;

@@ -36,8 +36,8 @@ struct PlannerSettings {
   double goal_bias = 0.05;     ///< probability of sampling a goal (RRT, RRT*)
   double rewire_factor = 1.1;  ///< RRT*: multiplier on the asymptotic-optimality radius constant
   double max_rewire_radius = 1.0;
-  int prm_neighbors = 10;      ///< PRM: k nearest neighbours per new roadmap node
-  int prm_batch = 200;         ///< PRM: samples added per growth step
+  int prm_neighbors = 10;  ///< PRM: k nearest neighbours per new roadmap node
+  int prm_batch = 200;     ///< PRM: samples added per growth step
 };
 
 enum class PlannerStatus { Success, IterationLimit, TimeLimit, InvalidStart, InvalidGoal };
@@ -50,14 +50,14 @@ struct PlannerStatistics {
   std::size_t edges = 0;               ///< PRM roadmap edges
   std::uint64_t collision_checks = 0;  ///< state-validity queries
   std::uint64_t edge_checks = 0;
-  double planning_time = 0.0;          ///< seconds (informational; not used for decisions)
+  double planning_time = 0.0;  ///< seconds (informational; not used for decisions)
 };
 
 struct PlannerResult {
   PlannerStatus status = PlannerStatus::IterationLimit;
   std::vector<VecX> path;  ///< start ... goal, every edge validated
   double path_length = 0.0;
-  int goal_index = -1;     ///< which goal was reached
+  int goal_index = -1;  ///< which goal was reached
   PlannerStatistics stats;
   [[nodiscard]] bool success() const { return status == PlannerStatus::Success; }
 };

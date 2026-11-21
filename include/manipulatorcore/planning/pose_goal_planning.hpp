@@ -41,15 +41,15 @@ struct PoseGoalPlanningOptions {
 struct PoseGoalPlanningResult {
   bool success = false;
   std::string message;
-  std::vector<VecX> ik_candidates;      ///< collision-free IK solutions, closest to start first
+  std::vector<VecX> ik_candidates;  ///< collision-free IK solutions, closest to start first
   int chosen_candidate = -1;
-  std::vector<VecX> raw_path;           ///< planner output for the chosen candidate
-  std::vector<VecX> path;               ///< after shortcutting
+  std::vector<VecX> raw_path;  ///< planner output for the chosen candidate
+  std::vector<VecX> path;      ///< after shortcutting
   double raw_length = 0.0;
   double path_length = 0.0;
-  bool smoothed = false;                ///< true if the timed trajectory follows a validated spline
+  bool smoothed = false;  ///< true if the timed trajectory follows a validated spline
   std::shared_ptr<const JointTrajectory> trajectory;
-  PlannerStatistics planner_stats;      ///< accumulated over all candidates
+  PlannerStatistics planner_stats;  ///< accumulated over all candidates
 };
 
 /// Plans from @p start to a configuration whose end-effector pose is @p target.
@@ -58,11 +58,8 @@ struct PoseGoalPlanningResult {
 
 /// Times a validated joint path: spline + time-optimal parameterization when smoothing succeeds,
 /// otherwise synchronized trapezoids that stop at each waypoint.
-[[nodiscard]] std::shared_ptr<const JointTrajectory> timeParameterizePath(const MotionValidator& validator,
-                                                                          const RobotModel& model,
-                                                                          const std::vector<VecX>& path, bool smooth,
-                                                                          const SplineSmoothingOptions& smoothing,
-                                                                          const TimeParameterizationOptions& timing,
-                                                                          bool* used_spline = nullptr);
+[[nodiscard]] std::shared_ptr<const JointTrajectory> timeParameterizePath(
+    const MotionValidator& validator, const RobotModel& model, const std::vector<VecX>& path, bool smooth,
+    const SplineSmoothingOptions& smoothing, const TimeParameterizationOptions& timing, bool* used_spline = nullptr);
 
 }  // namespace mc

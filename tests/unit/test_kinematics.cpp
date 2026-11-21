@@ -139,7 +139,7 @@ TEST_P(JacobianFiniteDifference, GeometricJacobian) {
     for (int i = 0; i < m.dof(); ++i) {
       const Mat4 dT = dTdq(m, q, i, kFdStep);
       numeric.col(i).head<3>() = vee(dT.topLeftCorner<3, 3>() * R_T);  // omega_s = vee(Rdot R^T)
-      numeric.col(i).tail<3>() = dT.topRightCorner<3, 1>();             // pdot
+      numeric.col(i).tail<3>() = dT.topRightCorner<3, 1>();            // pdot
     }
     EXPECT_MATRIX_NEAR(geometricJacobian(m, q), numeric, kFdTol) << m.name();
   }

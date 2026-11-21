@@ -11,9 +11,9 @@ namespace mc {
 
 /// Poses of every body frame and of the end-effector at a configuration.
 struct KinematicState {
-  VecX q;                         ///< configuration the state was computed at
-  std::vector<SE3> T_base_body;   ///< T_base_body[i]: pose of body i in the base frame
-  SE3 T_base_ee;                  ///< end-effector (tool) pose in the base frame
+  VecX q;                        ///< configuration the state was computed at
+  std::vector<SE3> T_base_body;  ///< T_base_body[i]: pose of body i in the base frame
+  SE3 T_base_ee;                 ///< end-effector (tool) pose in the base frame
 
   /// World-frame unit axis of joint i.
   [[nodiscard]] Vec3 jointAxis(const RobotModel& model, int i) const;

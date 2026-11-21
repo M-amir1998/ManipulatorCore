@@ -30,17 +30,17 @@ namespace mc {
 struct ContactSurface {
   Vec3 normal = Vec3::UnitZ();
   double offset = 0.0;
-  double stiffness = 5000.0;          ///< [N/m]
-  double damping = 50.0;              ///< [N·s/m]
-  double tangential_damping = 0.0;    ///< viscous friction [N·s/m]
+  double stiffness = 5000.0;        ///< [N/m]
+  double damping = 50.0;            ///< [N·s/m]
+  double tangential_damping = 0.0;  ///< viscous friction [N·s/m]
   std::string name;
 };
 
 /// The robot point that can touch the surfaces: a sphere attached to a body.
 struct ContactPoint {
-  int body = -1;                     ///< body index; -1 selects the last body
-  Vec3 point = Vec3::Zero();         ///< in the body frame; for body -1 this is relative to the tool frame
-  double radius = 0.0;               ///< [m]
+  int body = -1;              ///< body index; -1 selects the last body
+  Vec3 point = Vec3::Zero();  ///< in the body frame; for body -1 this is relative to the tool frame
+  double radius = 0.0;        ///< [m]
 };
 
 struct SimulatorOptions {
@@ -53,16 +53,16 @@ struct SimulatorOptions {
   double joint_limit_damping = 50.0;      ///< [N·m·s/rad]
   std::vector<ContactSurface> contacts;
   ContactPoint contact_point;
-  int record_every = 1;                   ///< log every k-th step
+  int record_every = 1;  ///< log every k-th step
 };
 
 struct SimulationLog {
   std::vector<double> time;
   std::vector<VecX> q;
   std::vector<VecX> qd;
-  std::vector<VecX> tau;               ///< applied (saturated) actuator torque
+  std::vector<VecX> tau;  ///< applied (saturated) actuator torque
   std::vector<SE3> ee_pose;
-  std::vector<Vec3> contact_force;     ///< total contact force on the contact point (base frame)
+  std::vector<Vec3> contact_force;  ///< total contact force on the contact point (base frame)
   void clear();
 };
 

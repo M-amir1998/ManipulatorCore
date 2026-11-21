@@ -25,7 +25,9 @@ Mat6X spaceJacobian(const RobotModel& model, const KinematicState& state) {
   return J;
 }
 
-Mat6X spaceJacobian(const RobotModel& model, const VecX& q) { return spaceJacobian(model, forwardKinematics(model, q)); }
+Mat6X spaceJacobian(const RobotModel& model, const VecX& q) {
+  return spaceJacobian(model, forwardKinematics(model, q));
+}
 
 Mat6X bodyJacobian(const RobotModel& model, const KinematicState& state) {
   return state.T_base_ee.inverse().adjoint() * spaceJacobian(model, state);

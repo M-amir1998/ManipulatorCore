@@ -38,8 +38,8 @@ SvdMetrics computeSvdMetrics(const MatX& A, double tolerance) {
   metrics.sigma_min = metrics.singular_values(metrics.singular_values.size() - 1);
   metrics.tolerance = resolveTolerance(tolerance, metrics.sigma_max, A.rows(), A.cols());
   metrics.rank = static_cast<int>((metrics.singular_values.array() > metrics.tolerance).count());
-  metrics.condition_number = metrics.sigma_min > 0.0 ? metrics.sigma_max / metrics.sigma_min
-                                                     : std::numeric_limits<double>::infinity();
+  metrics.condition_number =
+      metrics.sigma_min > 0.0 ? metrics.sigma_max / metrics.sigma_min : std::numeric_limits<double>::infinity();
   return metrics;
 }
 

@@ -8,9 +8,7 @@
 
 namespace mc {
 
-SE3 SE3::fromQuaternion(const Quat& q, const Vec3& translation) {
-  return {rotationFromQuaternion(q), translation};
-}
+SE3 SE3::fromQuaternion(const Quat& q, const Vec3& translation) { return {rotationFromQuaternion(q), translation}; }
 
 SE3 SE3::fromMatrix(const Mat4& T, double tolerance) {
   requireFinite(T, "SE3::fromMatrix");

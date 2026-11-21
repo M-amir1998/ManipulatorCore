@@ -32,8 +32,8 @@ struct JointLimits {
 struct Joint {
   std::string name;
   JointType type = JointType::Revolute;
-  SE3 origin;                  ///< T_parent_joint at q = 0
-  Vec3 axis = Vec3::UnitZ();   ///< unit axis in the joint frame
+  SE3 origin;                 ///< T_parent_joint at q = 0
+  Vec3 axis = Vec3::UnitZ();  ///< unit axis in the joint frame
   JointLimits limits;
   double damping = 0.0;   ///< viscous friction [N·m·s/rad or N·s/m]; used by the simulator only
   double armature = 0.0;  ///< reflected rotor inertia [kg·m² or kg], added to the mass-matrix diagonal

@@ -55,8 +55,8 @@ ShortcutResult shortcutPath(const MotionValidator& validator, const std::vector<
     }
     const auto locate = [&](double s) {
       const auto it_seg = std::upper_bound(cumulative.begin(), cumulative.end(), s);
-      const auto seg = static_cast<std::size_t>(std::clamp<std::ptrdiff_t>(it_seg - cumulative.begin(), 1,
-                                                                           static_cast<std::ptrdiff_t>(cumulative.size()) - 1)) -
+      const auto seg = static_cast<std::size_t>(std::clamp<std::ptrdiff_t>(
+                           it_seg - cumulative.begin(), 1, static_cast<std::ptrdiff_t>(cumulative.size()) - 1)) -
                        1;
       const double len = cumulative[seg + 1] - cumulative[seg];
       const double t = len > 0.0 ? (s - cumulative[seg]) / len : 0.0;

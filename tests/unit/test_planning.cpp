@@ -235,8 +235,8 @@ TEST(Scenarios, ObstacleScenariosRequirePlanning) {
       continue;
     }
     const RobotCollisionChecker checker(s.robot, s.obstacles);
-    const MotionValidator validator(JointSpace::fromModel(s.robot),
-                                    [&checker](const VecX& q) { return checker.isCollisionFree(q); }, 0.01);
+    const MotionValidator validator(
+        JointSpace::fromModel(s.robot), [&checker](const VecX& q) { return checker.isCollisionFree(q); }, 0.01);
     EXPECT_FALSE(validator.isEdgeValid(s.start, s.goal)) << s.name;
   }
 }

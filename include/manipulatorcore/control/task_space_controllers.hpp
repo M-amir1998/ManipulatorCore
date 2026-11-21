@@ -15,7 +15,7 @@ namespace mc {
 
 /// Secondary joint-space task executed in the null space of the Cartesian task.
 struct NullSpaceTask {
-  VecX posture;  ///< desired posture (empty: no posture stiffness)
+  VecX posture;            ///< desired posture (empty: no posture stiffness)
   double stiffness = 0.0;  ///< [N·m/rad]
   double damping = 0.0;    ///< [N·m·s/rad]
   /// Additional smooth joint-limit repulsion: tau += -limit_gain * grad(activation penalty).
@@ -32,7 +32,8 @@ struct NullSpaceTask {
 /// the configuration-dependent task inertia.
 class TaskSpacePDController final : public Controller {
  public:
-  TaskSpacePDController(RobotModel model, Mat6 kp, Mat6 kd, CartesianReferenceFn reference, NullSpaceTask null_space = {});
+  TaskSpacePDController(RobotModel model, Mat6 kp, Mat6 kd, CartesianReferenceFn reference,
+                        NullSpaceTask null_space = {});
   [[nodiscard]] std::string name() const override { return "task-space PD"; }
   [[nodiscard]] VecX computeTorque(const ControllerInput& input) override;
 
@@ -67,9 +68,9 @@ class CartesianImpedanceController final : public Controller {
 /// Parameters of the admittance model M_d xedd + D_d xedot + K_d xe = F_ext acting on the
 /// translational deviation xe = x_c - x_d of the commanded position from the desired one.
 struct AdmittanceParameters {
-  Vec3 mass = Vec3::Constant(2.0);        ///< [kg]
-  Vec3 damping = Vec3::Constant(60.0);    ///< [N·s/m]
-  Vec3 stiffness = Vec3::Constant(300.0); ///< [N/m]
+  Vec3 mass = Vec3::Constant(2.0);         ///< [kg]
+  Vec3 damping = Vec3::Constant(60.0);     ///< [N·s/m]
+  Vec3 stiffness = Vec3::Constant(300.0);  ///< [N/m]
 };
 
 /// Admittance control: the measured external force drives a virtual mass-spring-damper that

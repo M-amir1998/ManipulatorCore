@@ -25,8 +25,8 @@ Quat slerp(const Quat& q0_in, const Quat& q1_in, double s) {
   const double sin_theta = std::sin(theta);
   const double w0 = std::sin((1.0 - s) * theta) / sin_theta;
   const double w1 = std::sin(s * theta) / sin_theta;
-  return normalizeQuaternion(Quat(w0 * q0.w() + w1 * q1.w(), w0 * q0.x() + w1 * q1.x(), w0 * q0.y() + w1 * q1.y(),
-                                  w0 * q0.z() + w1 * q1.z()));
+  return normalizeQuaternion(
+      Quat(w0 * q0.w() + w1 * q1.w(), w0 * q0.x() + w1 * q1.x(), w0 * q0.y() + w1 * q1.y(), w0 * q0.z() + w1 * q1.z()));
 }
 
 Mat3 interpolateRotation(const Mat3& R0, const Mat3& R1, double s) {
@@ -38,8 +38,6 @@ SE3 interpolatePoseDecoupled(const SE3& T0, const SE3& T1, double s) {
           T0.translation() + s * (T1.translation() - T0.translation())};
 }
 
-SE3 interpolatePoseScrew(const SE3& T0, const SE3& T1, double s) {
-  return T0 * expSE3(s * logSE3(T0.inverse() * T1));
-}
+SE3 interpolatePoseScrew(const SE3& T0, const SE3& T1, double s) { return T0 * expSE3(s * logSE3(T0.inverse() * T1)); }
 
 }  // namespace mc

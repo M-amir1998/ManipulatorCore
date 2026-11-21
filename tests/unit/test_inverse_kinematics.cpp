@@ -40,8 +40,8 @@ TEST(AnalyticalIK, Planar2RTwoSolutionsReachTarget) {
 }
 
 TEST(AnalyticalIK, Planar2RUnreachableAndBoundary) {
-  EXPECT_TRUE(planar2RInverseKinematics(1.0, 0.8, Vec2(2.0, 0.0)).empty());   // too far
-  EXPECT_TRUE(planar2RInverseKinematics(1.0, 0.8, Vec2(0.1, 0.0)).empty());   // inside the hole
+  EXPECT_TRUE(planar2RInverseKinematics(1.0, 0.8, Vec2(2.0, 0.0)).empty());    // too far
+  EXPECT_TRUE(planar2RInverseKinematics(1.0, 0.8, Vec2(0.1, 0.0)).empty());    // inside the hole
   const auto stretched = planar2RInverseKinematics(1.0, 0.8, Vec2(0.0, 1.8));  // boundary
   ASSERT_EQ(stretched.size(), 1U);
   EXPECT_NEAR(stretched[0](0), kHalfPi, 1e-12);
@@ -289,7 +289,9 @@ TEST_P(ObjectiveGradients, MatchFiniteDifferences) {
     // Stay inside the limits so the barrier is smooth.
     const VecX q = 0.8 * test::randomConfiguration(model, rng);
     const ObjectiveValue v = evaluateObjective(GetParam(), model, q);
-    const auto f = [&](const VecX& x) -> VecX { return VecX::Constant(1, evaluateObjective(GetParam(), model, x).value); };
+    const auto f = [&](const VecX& x) -> VecX {
+      return VecX::Constant(1, evaluateObjective(GetParam(), model, x).value);
+    };
     const MatX numeric = numericalJacobian(f, q, 1e-5);
     EXPECT_MATRIX_NEAR(v.gradient.transpose().eval(), numeric, 1e-5) << toString(GetParam());
   }

@@ -27,9 +27,7 @@ Mat3 hat(const Vec3& w) {
   return W;
 }
 
-Vec3 vee(const Mat3& W) {
-  return {0.5 * (W(2, 1) - W(1, 2)), 0.5 * (W(0, 2) - W(2, 0)), 0.5 * (W(1, 0) - W(0, 1))};
-}
+Vec3 vee(const Mat3& W) { return {0.5 * (W(2, 1) - W(1, 2)), 0.5 * (W(0, 2) - W(2, 0)), 0.5 * (W(1, 0) - W(0, 1))}; }
 
 Mat3 expSO3(const Vec3& phi) {
   const double theta_sq = phi.squaredNorm();
@@ -128,8 +126,8 @@ Mat3 rotY(double angle) {
   const double c = std::cos(angle);
   const double s = std::sin(angle);
   Mat3 R;
-  R << c, 0.0, s,    //
-      0.0, 1.0, 0.0, //
+  R << c, 0.0, s,     //
+      0.0, 1.0, 0.0,  //
       -s, 0.0, c;
   return R;
 }

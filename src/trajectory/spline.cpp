@@ -64,8 +64,7 @@ CubicSpline::CubicSpline(std::vector<double> knots, std::vector<VecX> values, Bo
 
 CubicSpline::Sample CubicSpline::evaluate(double u) const {
   u = std::clamp(u, knots_.front(), knots_.back());
-  std::size_t i =
-      static_cast<std::size_t>(std::upper_bound(knots_.begin(), knots_.end(), u) - knots_.begin());
+  std::size_t i = static_cast<std::size_t>(std::upper_bound(knots_.begin(), knots_.end(), u) - knots_.begin());
   i = std::clamp<std::size_t>(i, 1, knots_.size() - 1) - 1;
   const double h = knots_[i + 1] - knots_[i];
   const double A = (knots_[i + 1] - u) / h;

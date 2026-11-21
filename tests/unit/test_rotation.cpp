@@ -97,8 +97,8 @@ TEST_P(EulerRoundTrip, RandomRotations) {
 
 TEST_P(EulerRoundTrip, GimbalLockReconstructs) {
   const EulerSequence seq = GetParam();
-  const std::array<double, 2> locked_betas = seq == EulerSequence::ZYZ ? std::array<double, 2>{0.0, kPi}
-                                                                       : std::array<double, 2>{kHalfPi, -kHalfPi};
+  const std::array<double, 2> locked_betas =
+      seq == EulerSequence::ZYZ ? std::array<double, 2>{0.0, kPi} : std::array<double, 2>{kHalfPi, -kHalfPi};
   for (const double beta : locked_betas) {
     const Mat3 R = rotationFromEuler(Vec3(0.4, beta, -1.1), seq);
     const Vec3 angles = eulerFromRotation(R, seq);

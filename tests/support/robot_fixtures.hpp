@@ -31,8 +31,8 @@ inline RobotModel makeMixedChain() {
   bodies[1].inertia = Inertia::solidBox(2.0, Vec3(0.1, 0.2, 0.3), Vec3(0.05, 0.0, 0.0));
   bodies[2].name = "wrist";
   bodies[2].joint.name = "j3";
-  bodies[2].joint.origin = SE3(Eigen::AngleAxisd(-0.7, Vec3(0.0, 1.0, 1.0).normalized()).toRotationMatrix(),
-                               Vec3(0.0, 0.25, 0.1));
+  bodies[2].joint.origin =
+      SE3(Eigen::AngleAxisd(-0.7, Vec3(0.0, 1.0, 1.0).normalized()).toRotationMatrix(), Vec3(0.0, 0.25, 0.1));
   bodies[2].joint.axis = Vec3(0.3, -0.2, 1.0).normalized();
   bodies[2].joint.armature = 0.02;
   bodies[2].inertia = Inertia::solidSphere(1.0, 0.05, Vec3(0.0, 0.0, 0.1));

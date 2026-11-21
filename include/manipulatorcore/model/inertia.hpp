@@ -10,9 +10,9 @@ namespace mc {
 
 /// Mass, centre of mass and rotational inertia of a rigid body, written in the body frame.
 struct Inertia {
-  double mass = 0.0;                      ///< [kg]
-  Vec3 com = Vec3::Zero();                ///< centre of mass in the body frame [m]
-  Mat3 inertia_com = Mat3::Zero();        ///< rotational inertia about the COM, body axes [kg·m²]
+  double mass = 0.0;                ///< [kg]
+  Vec3 com = Vec3::Zero();          ///< centre of mass in the body frame [m]
+  Mat3 inertia_com = Mat3::Zero();  ///< rotational inertia about the COM, body axes [kg·m²]
 
   /// Point mass at @p com.
   [[nodiscard]] static Inertia pointMass(double mass, const Vec3& com);

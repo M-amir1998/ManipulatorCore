@@ -1,0 +1,111 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": { "major": 3, "minor": 21, "patch": 0 },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "MC_WARNINGS_AS_ERRORS": "ON"
+      }
+    },
+    {
+      "name": "debug",
+      "displayName": "Debug (tests, warnings as errors)",
+      "inherits": "base",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+    },
+    {
+      "name": "release",
+      "displayName": "Release (tests, benchmarks, demos)",
+      "inherits": "base",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
+    },
+    {
+      "name": "python",
+      "displayName": "Release with pybind11 bindings",
+      "inherits": "release",
+      "cacheVariables": { "MC_BUILD_PYTHON": "ON" }
+    },
+    {
+      "name": "asan-ubsan",
+      "displayName": "AddressSanitizer + UBSan (GCC/Clang)",
+      "inherits": "base",
+      "condition": { "type": "notEquals", "lhs": "${hostSystemName}", "rhs": "Windows" },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "MC_ENABLE_ASAN": "ON",
+        "MC_ENABLE_UBSAN": "ON",
+        "MC_BUILD_BENCHMARKS": "OFF"
+      }
+    },
+    {
+      "name": "clang-tidy",
+      "displayName": "clang-tidy during compilation",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "MC_ENABLE_CLANG_TIDY": "ON",
+        "MC_BUILD_BENCHMARKS": "OFF"
+      }
+    },
+    {
+      "name": "msvc-release",
+      "displayName": "MSVC Release",
+      "inherits": "release",
+      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows" },
+      "cacheVariables": { "CMAKE_C_COMPILER": "cl", "CMAKE_CXX_COMPILER": "cl" }
+    },
+    {
+      "name": "msvc-asan",
+      "displayName": "MSVC AddressSanitizer",
+      "inherits": "base",
+      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows" },
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "cl",
+        "CMAKE_CXX_COMPILER": "cl",
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "MC_ENABLE_ASAN": "ON",
+        "MC_BUILD_BENCHMARKS": "OFF"
+      }
+    },
+    {
+      "name": "clang-cl-ubsan",
+      "displayName": "clang-cl UBSan (trap mode)",
+      "inherits": "base",
+      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows" },
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang-cl",
+        "CMAKE_CXX_COMPILER": "clang-cl",
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "MC_ENABLE_UBSAN": "ON",
+        "MC_BUILD_BENCHMARKS": "OFF"
+      }
+    }
+  ],
+  "buildPresets": [
+    { "name": "debug", "configurePreset": "debug" },
+    { "name": "release", "configurePreset": "release" },
+    { "name": "asan-ubsan", "configurePreset": "asan-ubsan" },
+    { "name": "msvc-release", "configurePreset": "msvc-release" },
+    { "name": "msvc-asan", "configurePreset": "msvc-asan" },
+    { "name": "clang-cl-ubsan", "configurePreset": "clang-cl-ubsan" }
+  ],
+  "testPresets": [
+    {
+      "name": "debug",
+      "configurePreset": "debug",
+      "output": { "outputOnFailure": true },
+      "execution": { "jobs": 4 }
+    },
+    {
+      "name": "release",
+      "configurePreset": "release",
+      "output": { "outputOnFailure": true },
+      "execution": { "jobs": 4 }
+    }
+  ]
+}

@@ -15,10 +15,10 @@
 namespace mc {
 
 struct JacobianAnalysis {
-  VecX singular_values;           ///< descending
-  int rank = 0;                   ///< numerical rank at the given tolerance
-  double tolerance = 0.0;         ///< singular-value threshold used for the rank decision
-  double sigma_min = 0.0;         ///< smallest of the min(rows, cols) singular values
+  VecX singular_values;    ///< descending
+  int rank = 0;            ///< numerical rank at the given tolerance
+  double tolerance = 0.0;  ///< singular-value threshold used for the rank decision
+  double sigma_min = 0.0;  ///< smallest of the min(rows, cols) singular values
   double sigma_max = 0.0;
   double condition_number = 0.0;  ///< sigma_max / sigma_min; +infinity at a singularity
   double manipulability = 0.0;    ///< Yoshikawa: product of the min(rows, cols) singular values

@@ -89,8 +89,7 @@ class CartesianTrajectory {
   /// Minimum-time trapezoidal scaling under linear and angular speed/acceleration limits.
   [[nodiscard]] static CartesianTrajectory trapezoidal(std::shared_ptr<const CartesianPath> path,
                                                        double max_linear_velocity, double max_linear_acceleration,
-                                                       double max_angular_velocity,
-                                                       double max_angular_acceleration);
+                                                       double max_angular_velocity, double max_angular_acceleration);
 
   /// Rest-to-rest quintic scaling of a given duration.
   [[nodiscard]] static CartesianTrajectory quintic(std::shared_ptr<const CartesianPath> path, double duration);

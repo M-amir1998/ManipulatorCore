@@ -271,8 +271,8 @@ TEST(CartesianPath, ArcGeometryAndDerivatives) {
 }
 
 TEST(CartesianTrajectory, TwistMatchesPoseDerivative) {
-  const auto path = std::make_shared<LinePath>(SE3(Mat3::Identity(), Vec3(0.5, 0.0, 0.3)),
-                                               SE3(rotX(0.6), Vec3(0.5, 0.4, 0.3)));
+  const auto path =
+      std::make_shared<LinePath>(SE3(Mat3::Identity(), Vec3(0.5, 0.0, 0.3)), SE3(rotX(0.6), Vec3(0.5, 0.4, 0.3)));
   const CartesianTrajectory traj = CartesianTrajectory::trapezoidal(path, 0.5, 1.0, 1.0, 2.0);
   const double h = 1e-6;
   for (const double frac : {0.1, 0.4, 0.75}) {
@@ -319,8 +319,8 @@ TEST(TimeParameterization, SplinePathRespectsLimitsUnderDenseSampling) {
   const TimeOptimalTrajectory traj =
       timeOptimalParameterization(path, model.velocityLimits(), model.accelerationLimits());
   // Dense sampling (5x finer than the grid on average) must respect the true limits.
-  const LimitUsage usage = evaluateLimitUsage(traj, model.velocityLimits(), model.accelerationLimits(),
-                                              traj.duration() / 5000.0);
+  const LimitUsage usage =
+      evaluateLimitUsage(traj, model.velocityLimits(), model.accelerationLimits(), traj.duration() / 5000.0);
   EXPECT_TRUE(usage.within(1e-9)) << "velocity ratio " << usage.max_velocity_ratio << ", acceleration ratio "
                                   << usage.max_acceleration_ratio;
   EXPECT_GT(std::max(usage.max_velocity_ratio, usage.max_acceleration_ratio), 0.9);  // near time-optimal

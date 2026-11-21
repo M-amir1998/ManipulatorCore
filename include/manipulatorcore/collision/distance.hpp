@@ -3,12 +3,12 @@
 /// @file distance.hpp
 /// @brief Signed distance and closest points between posed geometric primitives.
 ///
-/// | pair                          | method                                         | exact?          |
-/// | ----------------------------- | ---------------------------------------------- | --------------- |
-/// | sphere/capsule - sphere/capsule | closest points between core segments          | yes (signed)    |
-/// | sphere/capsule - box          | convex 1-D minimization of the box SDF on the core | separation: yes; penetration: core depth |
-/// | box - box                     | GJK (separated), separating-axis depth (overlap) | separation: yes; penetration: SAT depth |
-/// | anything - half-space         | support point against the plane                | yes (signed)    |
+/// Pairs and methods:
+///  - sphere/capsule vs sphere/capsule: closest points between the core segments (exact, signed)
+///  - sphere/capsule vs box: convex 1-D minimization of the box SDF along the core
+///    (exact when separated; penetration measured as the deepest core point)
+///  - box vs box: GJK when separated (exact), separating-axis overlap depth when penetrating
+///  - anything vs half-space: support point against the plane (exact, signed)
 ///
 /// Negative distances indicate penetration. For penetrating capsule-box and box-box pairs the
 /// magnitude is a penetration measure (not necessarily the exact translational depth), which is
@@ -21,10 +21,10 @@
 namespace mc {
 
 struct DistanceResult {
-  double distance = 0.0;       ///< signed distance; < 0 means penetration
-  Vec3 point_a = Vec3::Zero(); ///< closest (or deepest) point on A, world frame
-  Vec3 point_b = Vec3::Zero(); ///< closest (or deepest) point on B, world frame
-  Vec3 normal = Vec3::UnitZ(); ///< unit direction from A towards B
+  double distance = 0.0;        ///< signed distance; < 0 means penetration
+  Vec3 point_a = Vec3::Zero();  ///< closest (or deepest) point on A, world frame
+  Vec3 point_b = Vec3::Zero();  ///< closest (or deepest) point on B, world frame
+  Vec3 normal = Vec3::UnitZ();  ///< unit direction from A towards B
 };
 
 /// Signed distance between geometry @p a at world pose @p T_a and @p b at @p T_b. Throws
@@ -42,8 +42,7 @@ struct DistanceResult {
 
 /// Closest points between segments [p1, q1] and [p2, q2] (C. Ericson, Real-Time Collision
 /// Detection, 2005, section 5.1.9). Returns the squared distance.
-double closestPointsSegmentSegment(const Vec3& p1, const Vec3& q1, const Vec3& p2, const Vec3& q2, Vec3& c1,
-                                   Vec3& c2);
+double closestPointsSegmentSegment(const Vec3& p1, const Vec3& q1, const Vec3& p2, const Vec3& q2, Vec3& c1, Vec3& c2);
 
 /// Signed distance from a world point to a box with half extents @p h at pose @p T_box, and the
 /// closest point on the box surface.

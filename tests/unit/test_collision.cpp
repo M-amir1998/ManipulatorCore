@@ -28,8 +28,8 @@ TEST(Collision, SegmentSegmentKnownCases) {
   EXPECT_MATRIX_NEAR(c1, Vec3(0, 0, 0), 1e-15);
   EXPECT_MATRIX_NEAR(c2, Vec3(0, 0, 1), 1e-15);
   // Parallel overlapping segments.
-  EXPECT_NEAR(closestPointsSegmentSegment(Vec3(0, 0, 0), Vec3(2, 0, 0), Vec3(1, 0.5, 0), Vec3(3, 0.5, 0), c1, c2),
-              0.25, 1e-15);
+  EXPECT_NEAR(closestPointsSegmentSegment(Vec3(0, 0, 0), Vec3(2, 0, 0), Vec3(1, 0.5, 0), Vec3(3, 0.5, 0), c1, c2), 0.25,
+              1e-15);
   // Endpoint regions.
   EXPECT_NEAR(closestPointsSegmentSegment(Vec3(0, 0, 0), Vec3(1, 0, 0), Vec3(2, 1, 0), Vec3(3, 1, 0), c1, c2), 2.0,
               1e-15);
@@ -56,12 +56,14 @@ TEST(Collision, PointBoxSignedDistance) {
 // ------------------------------------------------------------------------------------------------
 
 TEST(Collision, SphereSphere) {
-  const DistanceResult r = computeDistance(Sphere{0.5}, SE3::Identity(), Sphere{0.25}, SE3::fromTranslation(Vec3(2, 0, 0)));
+  const DistanceResult r =
+      computeDistance(Sphere{0.5}, SE3::Identity(), Sphere{0.25}, SE3::fromTranslation(Vec3(2, 0, 0)));
   EXPECT_NEAR(r.distance, 1.25, 1e-15);
   EXPECT_MATRIX_NEAR(r.point_a, Vec3(0.5, 0, 0), 1e-15);
   EXPECT_MATRIX_NEAR(r.point_b, Vec3(1.75, 0, 0), 1e-15);
   EXPECT_MATRIX_NEAR(r.normal, Vec3(1, 0, 0), 1e-15);
-  const DistanceResult p = computeDistance(Sphere{0.5}, SE3::Identity(), Sphere{0.5}, SE3::fromTranslation(Vec3(0.6, 0, 0)));
+  const DistanceResult p =
+      computeDistance(Sphere{0.5}, SE3::Identity(), Sphere{0.5}, SE3::fromTranslation(Vec3(0.6, 0, 0)));
   EXPECT_NEAR(p.distance, -0.4, 1e-15);
 }
 
@@ -163,8 +165,8 @@ TEST(Collision, BoxBoxSeparatedWitnessPoints) {
 }
 
 TEST(Collision, BoxBoxOverlapDepth) {
-  const DistanceResult r =
-      computeDistance(Box{Vec3(0.5, 0.5, 0.5)}, SE3::Identity(), Box{Vec3(0.5, 0.5, 0.5)}, SE3::fromTranslation(Vec3(0.8, 0.1, 0)));
+  const DistanceResult r = computeDistance(Box{Vec3(0.5, 0.5, 0.5)}, SE3::Identity(), Box{Vec3(0.5, 0.5, 0.5)},
+                                           SE3::fromTranslation(Vec3(0.8, 0.1, 0)));
   EXPECT_NEAR(r.distance, -0.2, 1e-12);
   EXPECT_MATRIX_NEAR(r.normal, Vec3(1, 0, 0), 1e-12);
 }

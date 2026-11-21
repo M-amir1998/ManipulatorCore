@@ -128,8 +128,8 @@ VecX AdmittanceController::computeTorque(const ControllerInput& input) {
 
   // Admittance filter M xedd + D xedot + K xe = F_ext (semi-implicit Euler).
   const Vec3 force = input.external_wrench.tail<3>();
-  const Vec3 xe_ddot = (force - params_.damping.cwiseProduct(xe_dot_) - params_.stiffness.cwiseProduct(xe_))
-                           .cwiseQuotient(params_.mass);
+  const Vec3 xe_ddot =
+      (force - params_.damping.cwiseProduct(xe_dot_) - params_.stiffness.cwiseProduct(xe_)).cwiseQuotient(params_.mass);
   if (dt > 0.0) {
     xe_dot_ += dt * xe_ddot;
     xe_ += dt * xe_dot_;
@@ -147,8 +147,8 @@ VecX AdmittanceController::computeTorque(const ControllerInput& input) {
   const KinematicState state = forwardKinematics(model_, input.q);
   const Mat6X J = geometricJacobian(model_, state);
   const Vec6 e = poseErrorWorld(state.T_base_ee, commanded);
-  const Vec6 a_task = a_c + kd_ * (V_c - J * input.qd) + kp_ * e -
-                      geometricJacobianDotTimesVelocity(model_, input.q, input.qd);
+  const Vec6 a_task =
+      a_c + kd_ * (V_c - J * input.qd) + kp_ * e - geometricJacobianDotTimesVelocity(model_, input.q, input.qd);
   VecX qdd = solveDampedLeastSquares(J, a_task, 1e-3);
   qdd += nullSpaceProjector(J) * (-null_damping_ * input.qd);
   // Cancelling the measured wrench makes the inner loop an (ideal) motion source, so the

@@ -45,8 +45,8 @@ PoseGoalPlanningResult planToPose(const RobotCollisionChecker& checker, const Ve
   inflated.safety_margin = std::max(inflated.safety_margin, options.clearance);
   planning_checker.setOptions(inflated);
   const auto collision_free = [&planning_checker](const VecX& q) { return planning_checker.isCollisionFree(q); };
-  const auto validator = std::make_shared<const MotionValidator>(JointSpace::fromModel(model), collision_free,
-                                                                 options.edge_resolution);
+  const auto validator =
+      std::make_shared<const MotionValidator>(JointSpace::fromModel(model), collision_free, options.edge_resolution);
   if (!validator->isValid(start)) {
     result.message = "start configuration violates the planning clearance or the joint limits";
     return result;
@@ -95,9 +95,8 @@ PoseGoalPlanningResult planToPose(const RobotCollisionChecker& checker, const Ve
   }
 
   // 3. Time parameterization (spline smoothing is revalidated before use).
-  result.trajectory =
-      timeParameterizePath(*validator, model, result.path, options.smooth, options.smoothing, options.timing,
-                           &result.smoothed);
+  result.trajectory = timeParameterizePath(*validator, model, result.path, options.smooth, options.smoothing,
+                                           options.timing, &result.smoothed);
 
   // 4. Independent verification of the timed trajectory against the caller's checker.
   for (const TrajectoryPoint& p : sampleUniform(*result.trajectory, options.verification_dt)) {
