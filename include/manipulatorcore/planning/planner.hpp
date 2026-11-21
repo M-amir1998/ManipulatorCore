@@ -36,8 +36,18 @@ struct PlannerSettings {
   double goal_bias = 0.05;     ///< probability of sampling a goal (RRT, RRT*)
   double rewire_factor = 1.1;  ///< RRT*: multiplier on the asymptotic-optimality radius constant
   double max_rewire_radius = 1.0;
-  int prm_neighbors = 10;  ///< PRM: k nearest neighbours per new roadmap node
-  int prm_batch = 200;     ///< PRM: samples added per growth step
+  int prm_neighbors = 10;    ///< PRM: k nearest neighbours per new roadmap node
+  int prm_batch = 200;       ///< PRM: samples added per growth step
+  bool record_tree = false;  ///< copy the search tree / roadmap into the result (visualization)
+};
+
+/// Search tree (RRT family) or roadmap (PRM) recorded when PlannerSettings::record_tree is set.
+/// Nodes are in insertion order. For RRT* the parents are the final (rewired) ones.
+struct PlannerTree {
+  std::vector<VecX> nodes;
+  std::vector<int> parents;                // -1 for roots
+  std::vector<int> tree_index;             // 0: start tree, 1: goal tree (RRT-Connect)
+  std::vector<std::pair<int, int>> edges;  // PRM roadmap edges
 };
 
 enum class PlannerStatus { Success, IterationLimit, TimeLimit, InvalidStart, InvalidGoal };
@@ -59,6 +69,7 @@ struct PlannerResult {
   double path_length = 0.0;
   int goal_index = -1;  ///< which goal was reached
   PlannerStatistics stats;
+  PlannerTree tree;  ///< filled only when PlannerSettings::record_tree is set
   [[nodiscard]] bool success() const { return status == PlannerStatus::Success; }
 };
 

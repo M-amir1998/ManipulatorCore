@@ -78,6 +78,15 @@ struct Tree {
   }
 };
 
+void recordTree(PlannerTree& out, const Tree& t, int index) {
+  const auto offset = static_cast<int>(out.nodes.size());
+  for (std::size_t i = 0; i < t.q.size(); ++i) {
+    out.nodes.push_back(t.q[i]);
+    out.parents.push_back(t.parent[i] < 0 ? -1 : t.parent[i] + offset);
+    out.tree_index.push_back(index);
+  }
+}
+
 bool timeExceeded(const PlannerSettings& s, Clock::time_point t0) {
   return s.time_limit > 0.0 && secondsSince(t0) > s.time_limit;
 }
@@ -177,6 +186,9 @@ PlannerResult RRTPlanner::solve(const PlanningProblem& problem) {
     }
   }
   result.stats.nodes = tree.q.size();
+  if (settings_.record_tree) {
+    recordTree(result.tree, tree, 0);
+  }
   finalize(result, secondsSince(t0));
   return result;
 }
@@ -248,6 +260,10 @@ PlannerResult RRTConnectPlanner::solve(const PlanningProblem& problem) {
     std::swap(a, b);
   }
   result.stats.nodes = start_tree.q.size() + goal_tree.q.size();
+  if (settings_.record_tree) {
+    recordTree(result.tree, start_tree, 0);
+    recordTree(result.tree, goal_tree, 1);
+  }
   finalize(result, secondsSince(t0));
   return result;
 }
@@ -377,6 +393,9 @@ PlannerResult RRTStarPlanner::solve(const PlanningProblem& problem) {
     result.status = PlannerStatus::TimeLimit;
   }
   result.stats.nodes = tree.q.size();
+  if (settings_.record_tree) {
+    recordTree(result.tree, tree, 0);
+  }
   finalize(result, secondsSince(t0));
   return result;
 }
@@ -532,6 +551,18 @@ PlannerResult PRMPlanner::solve(const PlanningProblem& problem) {
   }
   result.stats.iterations = drawn;
   result.stats.nodes = nodes_.size();
+  if (settings_.record_tree) {
+    result.tree.nodes = nodes_;
+    result.tree.parents.assign(nodes_.size(), -1);
+    result.tree.tree_index.assign(nodes_.size(), 0);
+    for (std::size_t i = 0; i < adjacency_.size(); ++i) {
+      for (const auto& [j, w] : adjacency_[i]) {
+        if (static_cast<int>(i) < j) {
+          result.tree.edges.emplace_back(static_cast<int>(i), j);
+        }
+      }
+    }
+  }
   result.stats.edges = roadmapEdges();
   finalize(result, secondsSince(t0));
   return result;
