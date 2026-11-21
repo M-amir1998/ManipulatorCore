@@ -10,12 +10,24 @@ namespace mc {
 
 namespace {
 
-template <class... Ts>
-struct Overloaded : Ts... {
-  using Ts::operator()...;
+// A plain visitor rather than the "overloaded lambdas" idiom: under the MSVC ABI the fourth empty
+// lambda base is laid out past the end of the aggregate, which UBSan's object-size check reports.
+struct ShapeValidator {
+  void operator()(const Sphere& s) const {
+    require(std::isfinite(s.radius) && s.radius > 0.0, "Sphere radius must be positive");
+  }
+  void operator()(const Capsule& c) const {
+    require(std::isfinite(c.radius) && c.radius > 0.0, "Capsule radius must be positive");
+    require(std::isfinite(c.half_length) && c.half_length >= 0.0, "Capsule half_length must be non-negative");
+  }
+  void operator()(const Box& b) const {
+    require(b.half_extents.allFinite() && (b.half_extents.array() > 0.0).all(), "Box half extents must be positive");
+  }
+  void operator()(const HalfSpace& h) const {
+    require(h.normal.allFinite() && std::abs(h.normal.norm() - 1.0) < 1e-9, "HalfSpace normal must be a unit vector");
+    require(std::isfinite(h.offset), "HalfSpace offset must be finite");
+  }
 };
-template <class... Ts>
-Overloaded(Ts...) -> Overloaded<Ts...>;
 
 /// Rotation whose z axis is the unit vector u (minimal rotation from e_z).
 Mat3 rotationAligningZ(const Vec3& u) {
@@ -35,24 +47,7 @@ void validateShape(const Shape& shape) {
   requireFinite(shape.pose.rotation(), "Shape pose rotation");
   requireFinite(shape.pose.translation(), "Shape pose translation");
   require(isRotationMatrix(shape.pose.rotation(), 1e-6), "Shape pose rotation is not in SO(3)");
-  std::visit(
-      Overloaded{
-          [](const Sphere& s) { require(std::isfinite(s.radius) && s.radius > 0.0, "Sphere radius must be positive"); },
-          [](const Capsule& c) {
-            require(std::isfinite(c.radius) && c.radius > 0.0, "Capsule radius must be positive");
-            require(std::isfinite(c.half_length) && c.half_length >= 0.0, "Capsule half_length must be non-negative");
-          },
-          [](const Box& b) {
-            require(b.half_extents.allFinite() && (b.half_extents.array() > 0.0).all(),
-                    "Box half extents must be positive");
-          },
-          [](const HalfSpace& h) {
-            require(h.normal.allFinite() && std::abs(h.normal.norm() - 1.0) < 1e-9,
-                    "HalfSpace normal must be a unit vector");
-            require(std::isfinite(h.offset), "HalfSpace offset must be finite");
-          },
-      },
-      shape.geometry);
+  std::visit(ShapeValidator{}, shape.geometry);
 }
 
 Shape makeSphere(const Vec3& center, double radius, std::string name) {

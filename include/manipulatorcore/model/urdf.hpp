@@ -26,8 +26,8 @@ struct UrdfExportOptions {
 };
 
 struct UrdfImportOptions {
-  std::string base_link;  ///< empty: the root link of the tree
-  std::string tip_link;   ///< empty: follow the chain until it ends (must not branch)
+  std::string base_link{};  ///< empty: the root link of the tree
+  std::string tip_link{};   ///< empty: follow the chain until it ends (must not branch)
   /// Position range used for continuous joints [rad].
   double continuous_joint_range = kTwoPi;
   /// Defaults for limits missing from the URDF.
