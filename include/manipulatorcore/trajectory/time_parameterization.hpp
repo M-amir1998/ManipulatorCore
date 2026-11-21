@@ -40,6 +40,9 @@ class JointPath {
   [[nodiscard]] virtual VecX position(double s) const = 0;
   [[nodiscard]] virtual VecX firstDerivative(double s) const = 0;
   [[nodiscard]] virtual VecX secondDerivative(double s) const = 0;
+  /// Interior parameters where derivatives of the path change character (e.g. spline knots). The
+  /// discretization places grid points there.
+  [[nodiscard]] virtual std::vector<double> breakpoints() const { return {}; }
 };
 
 /// Natural cubic spline through waypoints, parameterized by cumulative chord length. C2 smooth,
@@ -53,6 +56,7 @@ class SplineJointPath final : public JointPath {
   [[nodiscard]] VecX position(double s) const override { return spline_.evaluate(s).value; }
   [[nodiscard]] VecX firstDerivative(double s) const override { return spline_.evaluate(s).first; }
   [[nodiscard]] VecX secondDerivative(double s) const override { return spline_.evaluate(s).second; }
+  [[nodiscard]] std::vector<double> breakpoints() const override { return spline_.knots(); }
 
  private:
   static CubicSpline build(const std::vector<VecX>& waypoints);
@@ -76,24 +80,34 @@ class StraightJointPath final : public JointPath {
 };
 
 struct TimeParameterizationOptions {
-  int grid_segments = 1000;       ///< number of path segments of the discretization
+  int grid_segments = 1000;       ///< nominal number of uniform path segments
+  int segments_per_breakpoint_interval = 6;  ///< minimum segments between consecutive path breakpoints
+  int max_grid_segments = 20000;  ///< upper bound on the refined grid
   double velocity_scale = 1.0;    ///< fraction of the velocity limits to use, (0, 1]
   double acceleration_scale = 1.0;
   double safety_margin = 0.01;    ///< limits are tightened by this fraction (discretization error)
+  /// After solving, the trajectory is sampled at this many points per grid segment; if any sampled
+  /// velocity/acceleration exceeds its limit, the whole trajectory is uniformly slowed down
+  /// (velocity scales with 1/k, acceleration with 1/k^2) until it does not. 0 disables the check.
+  int verification_samples_per_segment = 4;
 };
 
 /// The time-parameterized path produced by timeOptimalParameterization().
 class TimeOptimalTrajectory final : public JointTrajectory {
  public:
   [[nodiscard]] int dof() const override { return path_->dof(); }
-  [[nodiscard]] double duration() const override { return times_.back(); }
+  [[nodiscard]] double duration() const override { return times_.back() * time_scale_; }
   [[nodiscard]] TrajectoryPoint sample(double t) const override;
 
-  /// Grid of the solution: path parameter, sd^2 and sdd per grid point.
+  /// Grid of the solution: path parameter, sd^2 and sdd per grid point (before time scaling).
   [[nodiscard]] const std::vector<double>& gridS() const { return s_; }
   [[nodiscard]] const std::vector<double>& gridSdSquared() const { return x_; }
+  /// Uniform slow-down factor applied by the post-solve verification (1 if none was needed).
+  [[nodiscard]] double timeScale() const { return time_scale_; }
 
  private:
+  [[nodiscard]] TrajectoryPoint sampleUnscaled(double t) const;
+  double time_scale_ = 1.0;
   friend TimeOptimalTrajectory timeOptimalParameterization(std::shared_ptr<const JointPath>, const VecX&,
                                                           const VecX&, const TimeParameterizationOptions&);
   TimeOptimalTrajectory() = default;

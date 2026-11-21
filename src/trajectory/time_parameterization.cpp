@@ -134,27 +134,49 @@ TimeOptimalTrajectory timeOptimalParameterization(std::shared_ptr<const JointPat
   const double L = path->length();
   require(std::isfinite(L) && L > 0.0, "timeOptimalParameterization: path length must be positive");
 
+  require(options.segments_per_breakpoint_interval >= 1 && options.max_grid_segments >= options.grid_segments,
+          "timeOptimalParameterization: invalid grid refinement options");
+  require(options.verification_samples_per_segment >= 0,
+          "timeOptimalParameterization: verification_samples_per_segment must be >= 0");
+
   const VecX vmax = velocity_limits * (options.velocity_scale * (1.0 - options.safety_margin));
   const VecX amax = acceleration_limits * (options.acceleration_scale * (1.0 - options.safety_margin));
-  const auto N = static_cast<std::size_t>(options.grid_segments);
-  const double ds = L / static_cast<double>(N);
 
-  std::vector<double> s(N + 1);
+  // Grid: uniform spacing, refined so that every interval between path breakpoints (spline knots)
+  // holds several segments and every breakpoint is a grid point.
+  std::vector<double> marks{0.0};
+  for (const double b : path->breakpoints()) {
+    if (b > marks.back() + 1e-12 && b < L - 1e-12) {
+      marks.push_back(b);
+    }
+  }
+  marks.push_back(L);
+  const double nominal = L / static_cast<double>(options.grid_segments);
+  std::vector<double> s{0.0};
+  for (std::size_t k = 1; k < marks.size(); ++k) {
+    const double len = marks[k] - marks[k - 1];
+    const int pieces = std::max(options.segments_per_breakpoint_interval, static_cast<int>(std::ceil(len / nominal)));
+    for (int p = 1; p <= pieces; ++p) {
+      s.push_back(p == pieces ? marks[k] : marks[k - 1] + len * p / pieces);
+    }
+  }
+  require(static_cast<int>(s.size()) - 1 <= options.max_grid_segments,
+          "timeOptimalParameterization: refined grid exceeds max_grid_segments");
+  const std::size_t N = s.size() - 1;
   std::vector<VecX> d1(N + 1);
   std::vector<VecX> d2(N + 1);
   for (std::size_t i = 0; i <= N; ++i) {
-    s[i] = i == N ? L : static_cast<double>(i) * ds;
     d1[i] = path->firstDerivative(s[i]);
     d2[i] = path->secondDerivative(s[i]);
   }
 
   std::vector<Constraint> cs;
   cs.reserve(static_cast<std::size_t>(6 * n + 2));
-  // Constraints of grid segment i (from s_i to s_{i+1}) with the next state x + 2 ds u bounded by
-  // [0, x_next_max]. Joint limits are imposed at both ends of the segment.
+  // Constraints of grid segment i (from s_i to s_{i+1}, length ds_i) with the next state
+  // x + 2 ds_i u bounded by [0, x_next_max]. Joint limits are imposed at both ends of the segment.
   auto buildConstraints = [&](std::size_t i, double x_next_max) {
     cs.clear();
-    const double two_ds = 2.0 * ds;
+    const double two_ds = 2.0 * (s[i + 1] - s[i]);
     for (int j = 0; j < n; ++j) {
       const double qp0 = d1[i](j);
       const double qpp0 = d2[i](j);
@@ -195,19 +217,42 @@ TimeOptimalTrajectory timeOptimalParameterization(std::shared_ptr<const JointPat
     const double x = std::min(out.x_[i], K[i]);
     buildConstraints(i, K[i + 1]);
     const double u = maxU(cs, x);
-    out.x_[i + 1] = std::clamp(x + 2.0 * ds * u, 0.0, K[i + 1]);
+    out.x_[i + 1] = std::clamp(x + 2.0 * (s[i + 1] - s[i]) * u, 0.0, K[i + 1]);
   }
   out.x_[N] = 0.0;
   for (std::size_t i = 0; i < N; ++i) {
+    const double ds = s[i + 1] - s[i];
     out.u_[i] = (out.x_[i + 1] - out.x_[i]) / (2.0 * ds);
     const double speed_sum = std::sqrt(out.x_[i]) + std::sqrt(out.x_[i + 1]);
     require(speed_sum > 1e-12, "timeOptimalParameterization: zero path speed inside the path");
     out.times_[i + 1] = out.times_[i] + 2.0 * ds / speed_sum;  // exact for constant sdd
   }
+
+  // Verification: sample inside every grid segment against the true (scaled, untightened) limits
+  // and slow the whole trajectory down uniformly if the discretization let a peak through.
+  if (options.verification_samples_per_segment > 0) {
+    const VecX v_lim = velocity_limits * options.velocity_scale;
+    const VecX a_lim = acceleration_limits * options.acceleration_scale;
+    double v_ratio = 0.0;
+    double a_ratio = 0.0;
+    const int m = options.verification_samples_per_segment;
+    for (std::size_t i = 0; i < N; ++i) {
+      for (int k = 0; k <= m; ++k) {
+        const double t = out.times_[i] + (out.times_[i + 1] - out.times_[i]) * k / m;
+        const TrajectoryPoint p = out.sampleUnscaled(t);
+        v_ratio = std::max(v_ratio, p.qd.cwiseAbs().cwiseQuotient(v_lim).maxCoeff());
+        a_ratio = std::max(a_ratio, p.qdd.cwiseAbs().cwiseQuotient(a_lim).maxCoeff());
+      }
+    }
+    const double needed = std::max({1.0, v_ratio, std::sqrt(a_ratio)});
+    if (needed > 1.0) {
+      out.time_scale_ = needed * (1.0 + 1e-9);
+    }
+  }
   return out;
 }
 
-TrajectoryPoint TimeOptimalTrajectory::sample(double t) const {
+TrajectoryPoint TimeOptimalTrajectory::sampleUnscaled(double t) const {
   const double T = times_.back();
   if (t >= T) {
     return {T, path_->position(s_.back()), VecX::Zero(dof()), VecX::Zero(dof())};
@@ -224,4 +269,13 @@ TrajectoryPoint TimeOptimalTrajectory::sample(double t) const {
   return {t, path_->position(s), d1 * sd, d1 * u + path_->secondDerivative(s) * (sd * sd)};
 }
 
+TrajectoryPoint TimeOptimalTrajectory::sample(double t) const {
+  // Uniform time scaling t' = t / k: velocities scale by 1/k and accelerations by 1/k^2.
+  const double k = time_scale_;
+  TrajectoryPoint p = sampleUnscaled(t / k);
+  p.time = std::clamp(t, 0.0, duration());
+  p.qd /= k;
+  p.qdd /= k * k;
+  return p;
+}
 }  // namespace mc
