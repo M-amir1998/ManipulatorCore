@@ -1,0 +1,53 @@
+# Build trees
+/build/
+/build-*/
+/out/
+/install/
+/_install/
+cmake-build-*/
+CMakeUserPresets.json
+compile_commands.json
+Testing/
+
+# ROS 2 / colcon workspaces
+/ros2_ws/
+log/
+/ros2/build/
+/ros2/install/
+/ros2/log/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+*.so
+*.pyd
+
+# Rendering and benchmark scratch output (final assets live in docs/assets/)
+/render_tmp/
+/scripts/render/_frames/
+*.mp4
+*.avi
+*.mov
+/benchmark_results/
+*.benchmark.json
+
+# IDE / OS state
+.vs/
+.vscode/
+.idea/
+*.swp
+*.user
+.DS_Store
+Thumbs.db
+
+# Local environment and secrets
+.env
+.env.*
+*.pem
+*.key
+id_rsa*

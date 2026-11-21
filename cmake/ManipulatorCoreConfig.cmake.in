@@ -1,0 +1,12 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+set(MC_EIGEN_FROM_SYSTEM @MC_EIGEN_FROM_SYSTEM@)
+if(MC_EIGEN_FROM_SYSTEM)
+  find_dependency(Eigen3 3.4 CONFIG)
+endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/ManipulatorCoreTargets.cmake")
+
+check_required_components(ManipulatorCore)
