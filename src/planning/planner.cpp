@@ -164,7 +164,7 @@ PlannerResult RRTPlanner::solve(const PlanningProblem& problem) {
       break;
     }
     const VecX target = rng.bernoulli(settings_.goal_bias)
-                            ? problem.goals[static_cast<std::size_t>(rng.uniformIndex(problem.goals.size()))]
+                            ? problem.goals[rng.uniformIndex(problem.goals.size())]
                             : space.sampleUniform(rng);
     const int near = tree.nearest(space, target);
     const VecX q_new = space.steer(tree.q[static_cast<std::size_t>(near)], target, settings_.max_step);
@@ -314,7 +314,7 @@ PlannerResult RRTStarPlanner::solve(const PlanningProblem& problem) {
       break;
     }
     const VecX target = rng.bernoulli(settings_.goal_bias)
-                            ? problem.goals[static_cast<std::size_t>(rng.uniformIndex(problem.goals.size()))]
+                            ? problem.goals[rng.uniformIndex(problem.goals.size())]
                             : space.sampleUniform(rng);
     const int nearest = tree.nearest(space, target);
     const VecX q_new = space.steer(tree.q[static_cast<std::size_t>(nearest)], target, settings_.max_step);

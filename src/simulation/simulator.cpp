@@ -158,7 +158,7 @@ void Simulator::step(Controller& controller) {
 
 const SimulationLog& Simulator::run(Controller& controller, double duration) {
   require(std::isfinite(duration) && duration >= 0.0, "Simulator::run: duration must be non-negative");
-  const auto steps = static_cast<long long>(std::llround(duration / options_.dt));
+  const long long steps = std::llround(duration / options_.dt);
   for (long long k = 0; k < steps; ++k) {
     step(controller);
   }

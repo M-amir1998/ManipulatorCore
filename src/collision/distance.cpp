@@ -357,7 +357,10 @@ DistanceResult flipped(DistanceResult r) {
 
 Vec3 fallbackNormal(const Core& a, const Core& b) {
   const Vec3 d = coreCenter(b) - coreCenter(a);
-  return d.norm() > 1e-12 ? Vec3(d.normalized()) : Vec3(Vec3::UnitZ());
+  if (d.norm() > 1e-12) {
+    return d.normalized();
+  }
+  return Vec3::UnitZ();
 }
 
 DistanceResult roundedVsRounded(const Core& a, const Core& b) {
